@@ -71,7 +71,7 @@ export function exitAlternateBuffer(): void {
   process.stdout.write('\x1B[?1049l');
 }
 
-export function selectMenuOption(
+export async function selectMenuOption(
   title: string,
   subtitle: string,
   options: { name: string; description: string }[]
@@ -89,21 +89,19 @@ export function selectMenuOption(
     });
     console.log(`  ${chalk.cyan(' q')}. ${chalk.bold.red('Exit Console')}\n`);
 
-    return new Promise(async (resolve) => {
-      const selection = await prompt('Enter selection: ');
-      if (selection.toLowerCase() === 'q') {
-        resolve(count);
+    const selection = await prompt('Enter selection: ');
+    if (selection.toLowerCase() === 'q') {
+      return count;
+    } else {
+      const idx = parseInt(selection, 10) - 1;
+      if (isNaN(idx) || idx < 0 || idx >= count) {
+        console.log(chalk.red('Invalid selection. Press Enter to retry.'));
+        await pause();
+        return selectMenuOption(title, subtitle, options); // retry recursively
       } else {
-        const idx = parseInt(selection, 10) - 1;
-        if (isNaN(idx) || idx < 0 || idx >= count) {
-          console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-          await pause();
-          resolve(await selectMenuOption(title, subtitle, options)); // retry recursively
-        } else {
-          resolve(idx);
-        }
+        return idx;
       }
-    });
+    }
   }
 
   // TTY implementation: Arrow Key navigation

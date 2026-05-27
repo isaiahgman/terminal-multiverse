@@ -103,8 +103,9 @@ Initializes the per-repository context configuration containing coding guideline
     console.log(chalk.dim('\nReturning local branch to main...'));
     execSync('git checkout main', { stdio: 'ignore' });
 
-  } catch (error: any) {
-    console.error(chalk.red(`\nAn error occurred during PR pipeline: ${error.message}`));
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(chalk.red(`\nAn error occurred during PR pipeline: ${message}`));
   }
 
   await pause();
