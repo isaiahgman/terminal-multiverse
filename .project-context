@@ -1,0 +1,25 @@
+# Project Context: Terminal Multiverse
+
+## Core Architecture
+- The application is a unified interactive Node.js terminal app written in TypeScript.
+- Renders to standard output (stdout) with color utilities (`chalk`) and UI framing (`boxen`).
+- Interactive prompts must use Node's native `readline` or a simple async prompt loop to keep dependencies lightweight and robust.
+- The project follows a modular module structure:
+  ```
+  src/
+    index.ts            # Entrypoint & central menu router
+    utils/              # Shared CLI helpers (color, console clear, border frames)
+    modules/            # Self-contained features
+      <feature>/
+        core.ts         # Pure functions (side-effect free, testable)
+        runner.ts       # Interactive input/output loop
+        __tests__/
+          core.test.ts  # Unit tests for the core logic
+  ```
+
+## Development Standards
+- **Strict TypeScript:** No implicit `any`, explicit types required for exports.
+- **Pure Logic Separation:** Core functions MUST NOT write to standard output or read standard input directly. They should take inputs as parameters and return raw data/structures. The runner translates these to terminal frames.
+- **Testing:** Every core file must have >90% code coverage using Vitest.
+- **Styling Guidelines:** The terminal outputs should feel premium. Use high-contrast color palettes, styled title headers using `boxen`, neat alignment, and clear instruction indicators (e.g. `[Enter] to submit`, `[q] to quit`).
+- **Git Flow:** Strict pre-commit testing and linting checks using husky and lint-staged.
