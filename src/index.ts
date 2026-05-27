@@ -14,7 +14,6 @@ import { run as runFourier } from './modules/fourier/runner.js';
 import { run as runEnigma } from './modules/enigma/runner.js';
 import { run as runCollatz } from './modules/collatz/runner.js';
 import { run as runDiff } from './modules/diff/runner.js';
-import { run as runBrainfuck } from './modules/brainfuck/runner.js';
 
 const MODULES: Module[] = [
   {
@@ -71,11 +70,6 @@ const MODULES: Module[] = [
     name: '🔍 Visual Diff Comparison',
     description: 'Compare line diffs side-by-side using LCS algorithms',
     run: runDiff,
-  },
-  {
-    name: '💾 Brainfuck Interpreter',
-    description: 'Interactive tape inspector and esoteric program runner',
-    run: runBrainfuck,
   },
 ];
 
