@@ -1,12 +1,12 @@
 # 🌌 Terminal Multiverse
 
-An interactive terminal sandbox containing 12 distinct mathematical, visual, and cryptographic simulation modules. Written in strictly typed **TypeScript (ESM)** targeting modern Node.js environments.
+An interactive terminal sandbox containing 11 distinct mathematical, visual, and cryptographic simulation modules. Written in strictly typed **TypeScript (ESM)** targeting modern Node.js environments.
 
 ---
 
 ## 🚀 Features
 
-The application operates as a unified console router. Run the startup script and select from 12 distinct modules:
+The application operates as a unified console router. Run the startup script and select from 11 distinct modules:
 
 1. **🌿 L-System Fractal Garden:** Procedural organic structure engine mapping formal grammars onto an ASCII canvas. Customize depth, angle decay, and step sizes.
 2. **🦠 Conway's Game of Life:** Interactive cellular automata simulation loops running on toroidal grids with preset glider and oscillator structures.
@@ -19,7 +19,6 @@ The application operates as a unified console router. Run the startup script and
 9. **🔑 Enigma Cipher Machine:** Symmetric cryptography emulator of WWI-era rotor encryption, implementing double-stepping and reflector swaps.
 10. **📊 Collatz Conjecture Plotter:** Computes the $3n+1$ sequences and plots dynamic line/bar trajectory heights on a terminal graph.
 11. **🔍 Visual Diff Comparison:** Compares text blocks side-by-side or line-by-line using Longest Common Subsequence (LCS) diffing.
-12. **💾 Brainfuck Interpreter:** Renders a step-by-step debugger showing pointer indexes and memory tape states of running esoteric programs.
 
 ---
 
@@ -51,8 +50,7 @@ terminal-multiverse/
         ├── fourier/         # 8. Fourier Waveform Synthesizer
         ├── enigma/          # 9. Enigma Cipher Machine
         ├── collatz/         # 10. Collatz Graph Plotter
-        ├── diff/            # 11. Visual Diff Comparison
-        └── brainfuck/       # 12. Brainfuck Interpreter
+        └── diff/            # 11. Visual Diff Comparison
 ```
 
 Every module implements a clean separation of concerns:
