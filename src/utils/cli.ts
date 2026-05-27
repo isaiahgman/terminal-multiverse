@@ -6,8 +6,8 @@ import readline from 'readline';
 readline.emitKeypressEvents(process.stdin);
 
 export function clearScreen(): void {
-  // Clear the screen and reset cursor to home position
-  process.stdout.write('\x1Bc');
+  // Clear the screen and reset cursor to home position without resetting terminal state
+  process.stdout.write('\x1B[2J\x1B[3J\x1B[H');
 }
 
 export function printHeader(title: string, subtitle?: string): void {
@@ -61,6 +61,14 @@ export function showCursor(): void {
 
 export function cursorToHome(): void {
   process.stdout.write('\x1B[H');
+}
+
+export function enterAlternateBuffer(): void {
+  process.stdout.write('\x1B[?1049h');
+}
+
+export function exitAlternateBuffer(): void {
+  process.stdout.write('\x1B[?1049l');
 }
 
 export function selectMenuOption(

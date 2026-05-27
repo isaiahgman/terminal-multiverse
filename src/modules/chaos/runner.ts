@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { getAttractorPoints, stepChaosGame } from './core.js';
 
 export async function run(): Promise<void> {
@@ -67,10 +67,14 @@ export async function run(): Promise<void> {
 
     let totalPoints = 0;
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     while (keepSimulating) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`📐 Chaos Game: ${label}`));
-      console.log(chalk.dim(`Points Plotted: ${totalPoints} | Press [q] to stop`));
+      cursorToHome();
+      let frameText = chalk.bold.magenta(`📐 Chaos Game: ${label}\n`);
+      frameText += chalk.dim(`Points Plotted: ${totalPoints} | Press [q] to stop\n\n`);
 
       // Plot 150 new points per frame
       for (let i = 0; i < 150; i++) {
@@ -87,7 +91,6 @@ export async function run(): Promise<void> {
       }
 
       // Draw grid
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -103,15 +106,21 @@ export async function run(): Promise<void> {
         }
         frameText += row + '\n';
       }
-      console.log(frameText);
+
+      if (totalPoints > 8000) {
+        frameText += chalk.yellow('\nMax points reached! Simulation stabilized. Press [q] to exit.\n');
+      } else {
+        frameText += '\n';
+      }
+
+      process.stdout.write(frameText);
 
       // Frame wait (~50ms)
       await new Promise((resolve) => setTimeout(resolve, 50));
-
-      if (totalPoints > 8000) {
-        console.log(chalk.yellow('\nMax points reached! Simulation stabilized. Press [q] to exit.'));
-      }
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

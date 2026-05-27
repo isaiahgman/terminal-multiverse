@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { generatePresetHarmonics, plotWaveOnGrid, Harmonic } from './core.js';
 
 export async function run(): Promise<void> {
@@ -98,19 +98,20 @@ export async function run(): Promise<void> {
     const height = 25;
     const centerY = Math.floor(height / 2);
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     while (keepSimulating) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`📈 Fourier Waveform: ${name}`));
-      console.log(
-        chalk.dim(
-          `Harmonics: ${harmonics.length} | Shift: ${(timeOffset * 360).toFixed(0)}° | Press [q] to quit`
-        )
+      cursorToHome();
+      let frameText = chalk.bold.magenta(`📈 Fourier Waveform: ${name}\n`);
+      frameText += chalk.dim(
+        `Harmonics: ${harmonics.length} | Shift: ${(timeOffset * 360).toFixed(0)}° | Press [q] to quit\n\n`
       );
 
       const grid = plotWaveOnGrid(harmonics, width, height, timeOffset);
 
       // Render grid with axis
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -125,13 +126,16 @@ export async function run(): Promise<void> {
         }
         frameText += row + '\n';
       }
-      console.log(frameText);
+      process.stdout.write(frameText);
 
       // Scroll speed
       timeOffset += 0.015;
 
       await new Promise((resolve) => setTimeout(resolve, 40));
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

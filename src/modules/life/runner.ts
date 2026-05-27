@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { createGrid, nextGeneration } from './core.js';
 
 interface Preset {
@@ -115,6 +115,7 @@ export async function run(): Promise<void> {
     process.stdin.on('data', handleKey);
 
     hideCursor();
+    enterAlternateBuffer();
     clearScreen();
 
     while (keepSimulating) {
@@ -162,6 +163,7 @@ export async function run(): Promise<void> {
       await new Promise((resolve) => setTimeout(resolve, 120));
     }
 
+    exitAlternateBuffer();
     showCursor();
 
     // Restore stdin

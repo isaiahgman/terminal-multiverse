@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { generateMaze, solveMazeBFS } from './core.js';
 
 export async function run(): Promise<void> {
@@ -58,11 +58,15 @@ export async function run(): Promise<void> {
     };
     process.stdin.on('data', handleKey);
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     // 1. Animate the search frontier expansion
     while (visitedCount < visited.length && !interrupted) {
-      clearScreen();
-      console.log(chalk.bold.magenta('🕸️ BFS Solver: Exploring Corridors...'));
-      console.log(chalk.dim('Controls: Press [q] to stop | Light blue denotes searched paths.'));
+      cursorToHome();
+      let frameText = chalk.bold.magenta('🕸️ BFS Solver: Exploring Corridors...\n');
+      frameText += chalk.dim('Controls: Press [q] to stop | Light blue denotes searched paths.\n\n');
 
       // Add a chunk of visited cells to show expansion
       const chunkSize = Math.max(1, Math.floor(visited.length / 40));
@@ -73,7 +77,6 @@ export async function run(): Promise<void> {
       }
 
       // Render grid
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -91,7 +94,7 @@ export async function run(): Promise<void> {
         }
         frameText += row + '\n';
       }
-      console.log(frameText);
+      process.stdout.write(frameText);
 
       await new Promise((resolve) => setTimeout(resolve, 30));
     }
@@ -100,14 +103,13 @@ export async function run(): Promise<void> {
     if (!interrupted && solutionPath.length > 0) {
       const pathSet = new Set<string>();
       for (let i = 0; i < solutionPath.length && !interrupted; i++) {
-        clearScreen();
-        console.log(chalk.bold.green('🕸️ BFS Solver: Shortest Path Found!'));
-        console.log(chalk.dim(`Path Length: ${solutionPath.length} steps`));
+        cursorToHome();
+        let frameText = chalk.bold.green('🕸️ BFS Solver: Shortest Path Found!\n');
+        frameText += chalk.dim(`Path Length: ${solutionPath.length} steps\n\n`);
 
         const [px, py] = solutionPath[i];
         pathSet.add(`${px},${py}`);
 
-        let frameText = '';
         for (let y = 0; y < height; y++) {
           let row = '';
           for (let x = 0; x < width; x++) {
@@ -127,11 +129,14 @@ export async function run(): Promise<void> {
           }
           frameText += row + '\n';
         }
-        console.log(frameText);
+        process.stdout.write(frameText);
 
         await new Promise((resolve) => setTimeout(resolve, 20));
       }
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Cleanup stdin
     process.stdin.off('data', handleKey);

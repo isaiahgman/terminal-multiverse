@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { renderFrame } from './core.js';
 
 export async function run(): Promise<void> {
@@ -50,6 +50,7 @@ export async function run(): Promise<void> {
     const height = 25;
 
     hideCursor();
+    enterAlternateBuffer();
     clearScreen();
 
     while (keepRunning) {
@@ -88,6 +89,7 @@ export async function run(): Promise<void> {
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
 
+    exitAlternateBuffer();
     showCursor();
 
     // Restore stdin
