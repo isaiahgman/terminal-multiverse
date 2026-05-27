@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { createGrid, nextGeneration } from './core.js';
 
 interface Preset {
@@ -65,27 +65,21 @@ const PRESETS: Record<string, Preset> = {
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🦠 Conway\'s Game of Life', 'Cellular automaton simulating cellular growth and decay.');
-
-    console.log(`${chalk.bold('Available Starting States:')}`);
     const keys = Object.keys(PRESETS);
-    keys.forEach((key, idx) => {
-      console.log(`  ${chalk.cyan(idx + 1)}. ${PRESETS[key].name}`);
-    });
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const menuOptions = keys.map((key) => ({
+      name: PRESETS[key].name,
+      description: key === 'random' ? 'Random soup simulation' : 'Preset layout simulation',
+    }));
 
-    const selection = await prompt('Select starting state or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    const idx = await selectMenuOption(
+      '🦠 Conway\'s Game of Life',
+      'Cellular automaton simulating cellular growth and decay.',
+      menuOptions
+    );
+
+    if (idx === keys.length) {
       running = false;
       break;
-    }
-
-    const idx = parseInt(selection) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= keys.length) {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     const presetKey = keys[idx];
@@ -120,21 +114,24 @@ export async function run(): Promise<void> {
 
     process.stdin.on('data', handleKey);
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     while (keepSimulating) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`🦠 Conway's Game of Life - ${preset.name}`));
-      console.log(chalk.dim(`Generation: ${generation} | Press [q] to quit`));
+      cursorToHome();
+      
+      let frameText = chalk.bold.magenta(`🦠 Conway's Game of Life - ${preset.name}\n`);
+      frameText += chalk.dim(`Generation: ${generation} | Press [q] to quit\n\n`);
 
       // Draw grid
-      let output = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
           row += grid[y][x] === 1 ? chalk.green('█') : chalk.dim('.');
         }
-        output += row + '\n';
+        frameText += row + '\n';
       }
-      console.log(output);
 
       // Compute next state
       const next = nextGeneration(grid);
@@ -152,8 +149,12 @@ export async function run(): Promise<void> {
       }
 
       if (isSame) {
-        console.log(chalk.yellow('\nSystem stabilized! Press [q] to exit.'));
+        frameText += chalk.yellow('\nSystem stabilized! Press [q] to exit.\n');
+      } else {
+        frameText += '\n'; // Keep spacing stable
       }
+
+      process.stdout.write(frameText);
 
       grid = next;
       generation++;
@@ -161,6 +162,9 @@ export async function run(): Promise<void> {
       // Frame wait (120ms)
       await new Promise((resolve) => setTimeout(resolve, 120));
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

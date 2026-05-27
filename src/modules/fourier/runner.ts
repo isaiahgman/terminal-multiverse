@@ -1,22 +1,24 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { generatePresetHarmonics, plotWaveOnGrid, Harmonic } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('📈 Fourier Series Composition', 'Construct complex wave functions by summing sinusoidal harmonic frequencies.');
+    const menuOptions = [
+      { name: 'Square Wave', description: 'Odd harmonics summation (sin(x) + sin(3x)/3 + ...)' },
+      { name: 'Sawtooth Wave', description: 'All harmonics summation (sin(x) - sin(2x)/2 + ...)' },
+      { name: 'Triangle Wave', description: 'Alternating decaying harmonics (sin(x) - sin(3x)/9 + ...)' },
+      { name: 'Custom Harmonic Layering', description: 'Manually layer individual sine frequencies' }
+    ];
 
-    console.log(`${chalk.bold('Select Synthesis Target:')}`);
-    console.log(`  ${chalk.cyan('1')}. Square Wave (Odd harmonics)`);
-    console.log(`  ${chalk.cyan('2')}. Sawtooth Wave (All harmonics)`);
-    console.log(`  ${chalk.cyan('3')}. Triangle Wave (Alternating decaying harmonics)`);
-    console.log(`  ${chalk.cyan('4')}. Custom Harmonic Layering`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '📈 Fourier Series Composition',
+      'Construct complex wave functions by summing sinusoidal harmonic frequencies.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
@@ -24,16 +26,20 @@ export async function run(): Promise<void> {
     let harmonics: Harmonic[] = [];
     let name = '';
 
-    if (selection === '1' || selection === '2' || selection === '3') {
-      const type = selection === '1' ? 'square' : selection === '2' ? 'sawtooth' : 'triangle';
-      name = selection === '1' ? 'Square Wave' : selection === '2' ? 'Sawtooth Wave' : 'Triangle Wave';
+    if (idx === 0 || idx === 1 || idx === 2) {
+      const type = idx === 0 ? 'square' : idx === 1 ? 'sawtooth' : 'triangle';
+      name = idx === 0 ? 'Square Wave' : idx === 1 ? 'Sawtooth Wave' : 'Triangle Wave';
 
+      clearScreen();
+      printHeader(`📈 Compile Preset: ${name}`, 'Define the target frequency resolution.');
       const countInput = await prompt('Number of harmonics to compile (1 - 50, default 8): ');
       const count = countInput ? parseInt(countInput) : 8;
 
       harmonics = generatePresetHarmonics(type, count);
-    } else if (selection === '4') {
+    } else if (idx === 3) {
       name = 'Custom Layered Wave';
+      clearScreen();
+      printHeader('📈 Custom Wave Layering', 'Define custom frequency elements.');
       console.log(chalk.yellow('\nLayer your harmonics:'));
       let adding = true;
       while (adding) {
@@ -58,10 +64,6 @@ export async function run(): Promise<void> {
         harmonics.push({ frequency: freq, amplitude: amp, phase: 0 });
         console.log(chalk.green(`Added harmonic: f=${freq}Hz, amp=${amp}`));
       }
-    } else {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     if (harmonics.length === 0) {
@@ -96,19 +98,20 @@ export async function run(): Promise<void> {
     const height = 25;
     const centerY = Math.floor(height / 2);
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     while (keepSimulating) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`📈 Fourier Waveform: ${name}`));
-      console.log(
-        chalk.dim(
-          `Harmonics: ${harmonics.length} | Shift: ${(timeOffset * 360).toFixed(0)}° | Press [q] to quit`
-        )
+      cursorToHome();
+      let frameText = chalk.bold.magenta(`📈 Fourier Waveform: ${name}\n`);
+      frameText += chalk.dim(
+        `Harmonics: ${harmonics.length} | Shift: ${(timeOffset * 360).toFixed(0)}° | Press [q] to quit\n\n`
       );
 
       const grid = plotWaveOnGrid(harmonics, width, height, timeOffset);
 
       // Render grid with axis
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -123,13 +126,16 @@ export async function run(): Promise<void> {
         }
         frameText += row + '\n';
       }
-      console.log(frameText);
+      process.stdout.write(frameText);
 
       // Scroll speed
       timeOffset += 0.015;
 
       await new Promise((resolve) => setTimeout(resolve, 40));
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

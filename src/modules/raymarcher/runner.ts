@@ -1,34 +1,28 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
 import { renderFrame } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🕶️ Text-Based 3D Ray Marcher', 'Real-time math-based 3D renderer running in your terminal.');
+    const menuOptions = [
+      { name: 'Rotating Torus (Donut)', description: 'Math-based rotating torus render' },
+      { name: 'Deforming Organic Sphere', description: 'Interactive blobby coordinate deformation' }
+    ];
 
-    console.log(`${chalk.bold('Select 3D Shape:')}`);
-    console.log(`  ${chalk.cyan('1')}. Rotating Torus (Donut)`);
-    console.log(`  ${chalk.cyan('2')}. Deforming Organic Sphere`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '🕶️ Text-Based 3D Ray Marcher',
+      'Real-time math-based 3D renderer running in your terminal.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    let shape: 'torus' | 'sphere' = 'torus';
-    let label = 'Rotating Torus';
-    if (selection === '2') {
-      shape = 'sphere';
-      label = 'Deforming Sphere';
-    } else if (selection !== '1') {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
-    }
+    const shape = idx === 1 ? ('sphere' as const) : ('torus' as const);
+    const label = idx === 1 ? 'Deforming Sphere' : 'Rotating Torus';
 
     clearScreen();
     console.log(chalk.cyan('Preparing Raymarcher Engine...'));
@@ -55,14 +49,18 @@ export async function run(): Promise<void> {
     const width = 60;
     const height = 25;
 
+    hideCursor();
+    enterAlternateBuffer();
+    clearScreen();
+
     while (keepRunning) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`🕶️ Ray Marcher Scene: ${label}`));
-      console.log(chalk.dim(`Frame Angle: ${(time * 50).toFixed(0)}° | Press [q] to quit`));
+      cursorToHome();
+      
+      let frameContent = chalk.bold.magenta(`🕶️ Ray Marcher Scene: ${label}\n`);
+      frameContent += chalk.dim(`Frame Angle: ${(time * 50).toFixed(0)}° | Press [q] to quit\n\n`);
 
       const grid = renderFrame(width, height, time, shape);
 
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -80,15 +78,19 @@ export async function run(): Promise<void> {
             row += ' ';
           }
         }
-        frameText += row + '\n';
+        frameContent += row + '\n';
       }
-      console.log(frameText);
+      
+      process.stdout.write(frameContent);
 
       time += 0.08;
 
       // Frame wait (~60ms, around 16 FPS)
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
+
+    exitAlternateBuffer();
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

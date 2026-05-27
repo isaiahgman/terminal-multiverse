@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { buildTransitionTable, generateMarkovText } from './core.js';
 
 const PRESETS: Record<string, { name: string; text: string }> = {
@@ -65,19 +65,23 @@ We deliver actionable data insights utilizing robust, high-performance data lake
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('✍️ Markov Chain Text Generator', 'Generate procedural nonsense text based on word transition probabilities.');
-
-    console.log(`${chalk.bold('Select Text Corpus:')}`);
     const keys = Object.keys(PRESETS);
-    keys.forEach((key, idx) => {
-      console.log(`  ${chalk.cyan(idx + 1)}. ${PRESETS[key].name}`);
+    const menuOptions = keys.map((key) => ({
+      name: PRESETS[key].name,
+      description: `Preset text corpus`,
+    }));
+    menuOptions.push({
+      name: 'Enter Custom Text',
+      description: 'Input your own corpus directly',
     });
-    console.log(`  ${chalk.cyan('4')}. Enter Custom Text`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    const idx = await selectMenuOption(
+      '✍️ Markov Chain Text Generator',
+      'Generate procedural nonsense text based on word transition probabilities.',
+      menuOptions
+    );
+
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
@@ -85,23 +89,20 @@ export async function run(): Promise<void> {
     let corpus = '';
     let selectedName = '';
 
-    const idx = parseInt(selection) - 1;
-    if (idx >= 0 && idx < keys.length) {
+    if (idx < keys.length) {
       const preset = PRESETS[keys[idx]];
       corpus = preset.text;
       selectedName = preset.name;
-    } else if (selection === '4') {
+    } else {
       selectedName = 'Custom Text';
+      clearScreen();
+      printHeader('✍️ Custom Text Input', 'Enter or paste corpus text below.');
       corpus = await prompt('Enter your custom text: ');
       if (!corpus) {
         console.log(chalk.red('Corpus cannot be empty. Press Enter to retry.'));
         await pause();
         continue;
       }
-    } else {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     const nInput = await prompt('Prefix word-length (1, 2, or 3, default 2): ');

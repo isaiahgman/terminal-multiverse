@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
-import { computeDiff, alignSideBySide, DiffItem, SideBySideLine } from './core.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { computeDiff, alignSideBySide, DiffItem } from './core.js';
 
 interface DiffPreset {
   name: string;
@@ -34,68 +34,58 @@ export async function run(): Promise<void> {
   let viewMode: 'side-by-side' | 'unified' = 'side-by-side';
 
   while (running) {
-    clearScreen();
-    printHeader('🔍 Visual Diff Checker', 'Compare text blocks and identify added, removed, or modified lines.');
-
-    console.log(`${chalk.bold('Active Comparison Source:')} ${chalk.yellow(currentPresetName)}`);
-    console.log(`${chalk.bold('View Mode:')}               ${chalk.magenta(viewMode === 'side-by-side' ? 'Side-by-Side' : 'Unified Line-by-Line')}`);
-    console.log();
-
-    // Render diff
     const diff = computeDiff(textA, textB);
+    const diffOutput = viewMode === 'unified' ? renderUnifiedDiff(diff) : renderSideBySideDiff(diff);
 
-    if (viewMode === 'unified') {
-      renderUnifiedDiff(diff);
-    } else {
-      renderSideBySideDiff(diff);
-    }
+    const subtitleText = 
+      `${chalk.bold('Active Comparison Source:')} ${chalk.yellow(currentPresetName)}\n` +
+      `${chalk.bold('View Mode:')}               ${chalk.magenta(viewMode === 'side-by-side' ? 'Side-by-Side' : 'Unified Line-by-Line')}\n\n` +
+      diffOutput;
 
-    console.log(`\n${chalk.bold('Menu Options:')}`);
-    console.log(`  ${chalk.cyan('1.')} Toggle View Mode (Side-by-Side / Unified)`);
-    console.log(`  ${chalk.cyan('2.')} Load a Preset Comparison`);
-    console.log(`  ${chalk.cyan('3.')} Enter Custom Text A and Text B`);
-    console.log(`  ${chalk.cyan('q.')} Return to Main Menu\n`);
+    const menuOptions = [
+      { name: 'Toggle View Mode', description: 'Switch between Side-by-Side and Unified' },
+      { name: 'Load a Preset', description: 'Choose a pre-defined code, poetry, or JSON comparison' },
+      { name: 'Enter Custom Texts', description: 'Input your own text blocks A and B manually' }
+    ];
 
-    const selection = await prompt('Select an option: ');
-    const choice = selection.trim().toLowerCase();
+    const idx = await selectMenuOption(
+      '🔍 Visual Diff Checker',
+      subtitleText,
+      menuOptions
+    );
 
-    if (choice === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    switch (choice) {
-      case '1': {
+    switch (idx) {
+      case 0: {
         viewMode = viewMode === 'side-by-side' ? 'unified' : 'side-by-side';
         break;
       }
-      case '2': {
-        clearScreen();
-        printHeader('🔍 Visual Diff - Select Preset', 'Choose a preset text pair to view.');
+      case 1: {
         const keys = Object.keys(PRESETS);
-        keys.forEach((key, idx) => {
-          console.log(`  ${chalk.cyan(idx + 1)}. ${PRESETS[key].name}`);
-        });
-        console.log(`  ${chalk.cyan('b.')} Back\n`);
+        const presetOptions = keys.map((key) => ({
+          name: PRESETS[key].name,
+          description: 'Compare preset text pair'
+        }));
 
-        const presetChoice = await prompt('Select preset: ');
-        const cleanChoice = presetChoice.trim().toLowerCase();
-        if (cleanChoice === 'b') {
-          break;
-        }
-        const idx = parseInt(cleanChoice) - 1;
-        if (!isNaN(idx) && idx >= 0 && idx < keys.length) {
-          const key = keys[idx];
+        const presetIdx = await selectMenuOption(
+          '🔍 Visual Diff - Select Preset',
+          'Choose a preset text pair to view.',
+          presetOptions
+        );
+
+        if (presetIdx < keys.length) {
+          const key = keys[presetIdx];
           textA = PRESETS[key].textA;
           textB = PRESETS[key].textB;
           currentPresetName = PRESETS[key].name;
-        } else {
-          console.log(chalk.red('\nInvalid selection. Press Enter to retry.'));
-          await pause();
         }
         break;
       }
-      case '3': {
+      case 2: {
         clearScreen();
         printHeader('🔍 Visual Diff - Enter Text A', 'Enter original text. Type :done on a new line when finished.');
         const linesA: string[] = [];
@@ -129,60 +119,56 @@ export async function run(): Promise<void> {
         await pause();
         break;
       }
-      default:
-        console.log(chalk.red('\nInvalid choice. Press Enter to retry.'));
-        await pause();
-        break;
     }
   }
 }
 
-function renderUnifiedDiff(diff: DiffItem[]): void {
-  console.log(chalk.gray('┌' + '─'.repeat(78) + '┐'));
+function renderUnifiedDiff(diff: DiffItem[]): string {
+  let output = chalk.gray('┌' + '─'.repeat(78) + '┐\n');
   for (const item of diff) {
     if (item.type === 'unchanged') {
       const lineNumStr = item.oldLineNumber?.toString().padStart(4, ' ') || '    ';
-      console.log(chalk.gray(`│ ${lineNumStr}   ${item.value.padEnd(70, ' ').substring(0, 70)} │`));
+      output += chalk.gray(`│ ${lineNumStr}   ${item.value.padEnd(70, ' ').substring(0, 70)} │\n`);
     } else if (item.type === 'removed') {
       const lineNumStr = item.oldLineNumber?.toString().padStart(4, ' ') || '    ';
-      const formatted = `│ ${lineNumStr} - ${item.value.padEnd(70, ' ').substring(0, 70)} │`;
-      console.log(chalk.red(formatted));
+      const formatted = `│ ${lineNumStr} - ${item.value.padEnd(70, ' ').substring(0, 70)} │\n`;
+      output += chalk.red(formatted);
     } else if (item.type === 'added') {
       const lineNumStr = item.newLineNumber?.toString().padStart(4, ' ') || '    ';
-      const formatted = `│ ${lineNumStr} + ${item.value.padEnd(70, ' ').substring(0, 70)} │`;
-      console.log(chalk.green(formatted));
+      const formatted = `│ ${lineNumStr} + ${item.value.padEnd(70, ' ').substring(0, 70)} │\n`;
+      output += chalk.green(formatted);
     }
   }
-  console.log(chalk.gray('└' + '─'.repeat(78) + '┘'));
+  output += chalk.gray('└' + '─'.repeat(78) + '┘');
+  return output;
 }
 
-function renderSideBySideDiff(diff: DiffItem[]): void {
+function renderSideBySideDiff(diff: DiffItem[]): string {
   const aligned = alignSideBySide(diff);
   const colWidth = 36; // Left and Right halves are 36 chars wide
 
-  console.log(chalk.gray('┌' + '─'.repeat(colWidth + 2) + '┬' + '─'.repeat(colWidth + 2) + '┐'));
-  console.log(
+  let output = chalk.gray('┌' + '─'.repeat(colWidth + 2) + '┬' + '─'.repeat(colWidth + 2) + '┐\n');
+  output +=
     chalk.gray('│') +
-      chalk.bold.yellow(' Original Text'.padEnd(colWidth + 2, ' ')) +
-      chalk.gray('│') +
-      chalk.bold.yellow(' Modified Text'.padEnd(colWidth + 2, ' ')) +
-      chalk.gray('│')
-  );
-  console.log(chalk.gray('├' + '─'.repeat(colWidth + 2) + '┼' + '─'.repeat(colWidth + 2) + '┤'));
+    chalk.bold.yellow(' Original Text'.padEnd(colWidth + 2, ' ')) +
+    chalk.gray('│') +
+    chalk.bold.yellow(' Modified Text'.padEnd(colWidth + 2, ' ')) +
+    chalk.gray('│\n');
+  output += chalk.gray('├' + '─'.repeat(colWidth + 2) + '┼' + '─'.repeat(colWidth + 2) + '┤\n');
 
   for (const row of aligned) {
     const leftStr = formatSideColumn(row.left, colWidth);
     const rightStr = formatSideColumn(row.right, colWidth);
 
-    console.log(
+    output +=
       chalk.gray('│ ') +
-        leftStr +
-        chalk.gray(' │ ') +
-        rightStr +
-        chalk.gray(' │')
-    );
+      leftStr +
+      chalk.gray(' │ ') +
+      rightStr +
+      chalk.gray(' │\n');
   }
-  console.log(chalk.gray('└' + '─'.repeat(colWidth + 2) + '┴' + '─'.repeat(colWidth + 2) + '┘'));
+  output += chalk.gray('└' + '─'.repeat(colWidth + 2) + '┴' + '─'.repeat(colWidth + 2) + '┘');
+  return output;
 }
 
 function formatSideColumn(

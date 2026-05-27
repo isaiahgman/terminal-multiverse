@@ -1,29 +1,25 @@
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { textToMorse, generateMorseWavBuffer } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🔊 Web Audio Morse Wave Exporter', 'Translate text to international Morse Code and export as a playable .wav audio file.');
+    const menuOptions = [
+      { name: 'Translate & Export Morse Audio', description: 'Enter text, translate to Morse, and output .wav file' }
+    ];
 
-    console.log(`${chalk.bold('Options:')}`);
-    console.log(`  ${chalk.cyan('1')}. Translate & Export Morse Audio`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '🔊 Web Audio Morse Wave Exporter',
+      'Translate text to international Morse Code and export as a playable .wav audio file.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
-    }
-
-    if (selection !== '1') {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     clearScreen();
