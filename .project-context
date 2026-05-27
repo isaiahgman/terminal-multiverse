@@ -23,3 +23,9 @@
 - **Testing:** Every core file must have >90% code coverage using Vitest.
 - **Styling Guidelines:** The terminal outputs should feel premium. Use high-contrast color palettes, styled title headers using `boxen`, neat alignment, and clear instruction indicators (e.g. `[Enter] to submit`, `[q] to quit`).
 - **Git Flow:** Strict pre-commit testing and linting checks using husky and lint-staged.
+
+## GitHub Pull Request Workflow
+- All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers:
+  - `## Summary`
+  - `## Changes`
+- Do not use other heading hierarchies or alternative names for these sections.

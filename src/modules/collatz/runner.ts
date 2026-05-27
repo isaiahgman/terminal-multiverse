@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { getCollatzSequence, generateCollatzAsciiPlot } from './core.js';
 
 export async function run(): Promise<void> {
@@ -8,17 +8,6 @@ export async function run(): Promise<void> {
   let useLogScale = true;
 
   while (running) {
-    clearScreen();
-    printHeader(
-      '🔢 Collatz Conjecture Visualizer',
-      'Visualize the "3n + 1" sequence behavior and its eventual decay to 1.'
-    );
-
-    console.log(`${chalk.bold('Configuration & Stats:')}`);
-    console.log(`  ${chalk.yellow('Starting Number:')} ${currentNum}`);
-    console.log(`  ${chalk.yellow('Scaling Mode:')}    ${useLogScale ? chalk.magenta('Logarithmic') : chalk.cyan('Linear')} (recommended for large peaks)`);
-    console.log();
-
     let sequence: number[] = [];
     try {
       sequence = getCollatzSequence(currentNum);
@@ -26,14 +15,10 @@ export async function run(): Promise<void> {
       console.log(chalk.red(`Error generating sequence: ${e.message}`));
     }
 
+    let statsAndPlot = '';
     if (sequence.length > 0) {
       const peak = Math.max(...sequence);
       const steps = sequence.length - 1; // Stopping time
-
-      console.log(`${chalk.bold('Sequence Statistics:')}`);
-      console.log(`  - Stopping Time (Steps to 1): ${chalk.greenBright(steps)}`);
-      console.log(`  - Peak Value Reached:        ${chalk.greenBright(peak)}`);
-      console.log();
 
       // Display sequence snippet
       let seqSnippet = '';
@@ -44,23 +29,18 @@ export async function run(): Promise<void> {
         const lastPart = sequence.slice(-5).join(' ➔ ');
         seqSnippet = `${firstPart} ➔ ${chalk.dim('...')} ➔ ${lastPart}`;
       }
-      console.log(`${chalk.bold('Sequence Pathway:')}`);
-      console.log(`  ${seqSnippet}\n`);
 
-      // Generate and render the ASCII plot
+      // Generate the ASCII plot
       const width = 80;
       const height = 18;
       const plot = generateCollatzAsciiPlot(sequence, width, height, useLogScale);
 
-      console.log(`${chalk.bold('Trajectory Plot:')}`);
-      console.log(chalk.gray('┌' + '─'.repeat(width) + '┐'));
-
+      let plotText = '';
       for (let r = 0; r < height; r++) {
         let rowContent = '';
         for (let c = 0; c < width; c++) {
           const char = plot[r][c];
           if (char === '█') {
-            // Apply gradient color depending on the height
             const heightRatio = (height - 1 - r) / (height - 1);
             if (heightRatio > 0.8) {
               rowContent += chalk.red(char);
@@ -75,28 +55,44 @@ export async function run(): Promise<void> {
             rowContent += ' ';
           }
         }
-        console.log(chalk.gray('│') + rowContent + chalk.gray('│'));
+        plotText += chalk.gray('│') + rowContent + chalk.gray('│\n');
       }
-      console.log(chalk.gray('└' + '─'.repeat(width) + '┘'));
-      console.log(chalk.dim(`  Left: Start (n=${currentNum}) ${' '.repeat(width - 32)} Right: Target (n=1)`));
+
+      const borderLine = chalk.gray('├' + '─'.repeat(width) + '┤\n');
+      const bottomBorder = chalk.gray('└' + '─'.repeat(width) + '┘\n');
+
+      statsAndPlot = 
+        `${chalk.yellow('Current Number:')} ${currentNum} | ${chalk.yellow('Scaling Mode:')} ${useLogScale ? 'Logarithmic' : 'Linear'}\n` +
+        `${chalk.yellow('Stopping Time:')} ${chalk.greenBright(steps)} steps | ${chalk.yellow('Peak Reached:')} ${chalk.greenBright(peak)}\n\n` +
+        `${chalk.bold('Sequence Pathway:')}\n  ${seqSnippet}\n\n` +
+        `${chalk.bold('Trajectory Plot:')}\n` +
+        borderLine +
+        plotText +
+        bottomBorder +
+        chalk.dim(`  Left: Start (n=${currentNum}) ${' '.repeat(width - 32)} Right: Target (n=1)`);
     }
 
-    console.log(`\n${chalk.bold('Menu Options:')}`);
-    console.log(`  ${chalk.cyan('1.')} Input New Number`);
-    console.log(`  ${chalk.cyan('2.')} Toggle Scale (Linear / Logarithmic)`);
-    console.log(`  ${chalk.cyan('3.')} Try a famous number (e.g. 27, 871, 6171, 97)`);
-    console.log(`  ${chalk.cyan('q.')} Return to Main Menu\n`);
+    const menuOptions = [
+      { name: 'Input New Number', description: 'Enter a custom starting positive integer' },
+      { name: 'Toggle Scale Mode', description: `Switch between Logarithmic and Linear rendering` },
+      { name: 'Try a Famous Orbit', description: 'Select a notable Collatz starting seed' }
+    ];
 
-    const selection = await prompt('Select an option: ');
-    const choice = selection.trim().toLowerCase();
+    const idx = await selectMenuOption(
+      '🔢 Collatz Conjecture Visualizer',
+      statsAndPlot,
+      menuOptions
+    );
 
-    if (choice === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    switch (choice) {
-      case '1': {
+    switch (idx) {
+      case 0: {
+        clearScreen();
+        printHeader('🔢 Collatz - Input Starting Seed');
         const input = await prompt('Enter a positive integer: ');
         const parsed = parseInt(input, 10);
         if (isNaN(parsed) || parsed <= 0) {
@@ -107,33 +103,32 @@ export async function run(): Promise<void> {
         }
         break;
       }
-      case '2': {
+      case 1: {
         useLogScale = !useLogScale;
         break;
       }
-      case '3': {
-        clearScreen();
-        printHeader('🔢 Collatz - Famous Starting Numbers', 'Select a notable number with interesting dynamics.');
-        console.log(`  ${chalk.cyan('1.')} ${chalk.bold('27')}    - Steps: 111 | Peak: 9,232 (spikes dramatically)`);
-        console.log(`  ${chalk.cyan('2.')} ${chalk.bold('97')}    - Steps: 118 | Peak: 9,232`);
-        console.log(`  ${chalk.cyan('3.')} ${chalk.bold('871')}   - Steps: 178 | Peak: 190,996`);
-        console.log(`  ${chalk.cyan('4.')} ${chalk.bold('6171')}  - Steps: 261 | Peak: 2,634,800`);
-        console.log(`  ${chalk.cyan('5.')} ${chalk.bold('1023')}  - Steps: 311 | Peak: 104,788`);
-        console.log(`  ${chalk.cyan('b.')} Back\n`);
+      case 2: {
+        const famousOptions = [
+          { name: '27', description: 'Steps: 111 | Peak: 9,232 (spikes dramatically)' },
+          { name: '97', description: 'Steps: 118 | Peak: 9,232' },
+          { name: '871', description: 'Steps: 178 | Peak: 190,996' },
+          { name: '6171', description: 'Steps: 261 | Peak: 2,634,800' },
+          { name: '1023', description: 'Steps: 311 | Peak: 104,788' }
+        ];
 
-        const pSel = await prompt('Select a number: ');
-        const cleanPSel = pSel.trim().toLowerCase();
-        if (cleanPSel === '1') currentNum = 27;
-        else if (cleanPSel === '2') currentNum = 97;
-        else if (cleanPSel === '3') currentNum = 871;
-        else if (cleanPSel === '4') currentNum = 6171;
-        else if (cleanPSel === '5') currentNum = 1023;
+        const pSel = await selectMenuOption(
+          '🔢 Collatz - Famous Starting Numbers',
+          'Select a notable number with interesting orbital dynamics.',
+          famousOptions
+        );
+
+        if (pSel === 0) currentNum = 27;
+        else if (pSel === 1) currentNum = 97;
+        else if (pSel === 2) currentNum = 871;
+        else if (pSel === 3) currentNum = 6171;
+        else if (pSel === 4) currentNum = 1023;
         break;
       }
-      default:
-        console.log(chalk.red('\nInvalid choice. Press Enter to retry.'));
-        await pause();
-        break;
     }
   }
 }

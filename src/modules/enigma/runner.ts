@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { encryptString, EnigmaConfig } from './core.js';
 
 export async function run(): Promise<void> {
@@ -14,34 +14,29 @@ export async function run(): Promise<void> {
   let running = true;
 
   while (running) {
-    clearScreen();
-    printHeader('🔐 Enigma Machine Simulator', 'A simulated 3-rotor Enigma I/M3 encryption machine.');
+    const configText = `Rotors: Left: ${config.rotors[0]} | Middle: ${config.rotors[1]} | Right: ${config.rotors[2]}\nRotor Positions: [ ${config.positions.join(' ')} ]\nPlugboard: ${config.plugboard || 'None (direct wiring)'}\nReflector: Reflector ${config.reflector}`;
 
-    console.log(`${chalk.bold('Current Configuration:')}`);
-    console.log(`  ${chalk.yellow('Rotors:')} Left: ${config.rotors[0]} | Middle: ${config.rotors[1]} | Right: ${config.rotors[2]}`);
-    console.log(`  ${chalk.yellow('Rotor Positions:')} [ ${config.positions.join(' ')} ]`);
-    console.log(`  ${chalk.yellow('Plugboard:')} ${config.plugboard || chalk.dim('None (direct wiring)')}`);
-    console.log(`  ${chalk.yellow('Reflector:')} Reflector ${config.reflector}`);
-    console.log();
+    const menuOptions = [
+      { name: 'Configure Rotors', description: 'Select I, II, III order' },
+      { name: 'Set Initial Positions', description: 'Set starting letter for each rotor (A-Z)' },
+      { name: 'Set Plugboard Pairs', description: 'Map letter pairs to swap (e.g., AB CD EF)' },
+      { name: 'Encrypt / Decrypt a Message', description: 'Symmetric enciphering/deciphering loop' },
+      { name: 'Reset Rotor Positions', description: 'Reset positions back to A A A' }
+    ];
 
-    console.log(`${chalk.bold('Menu Options:')}`);
-    console.log(`  ${chalk.cyan('1.')} Configure Rotors (Select I, II, III order)`);
-    console.log(`  ${chalk.cyan('2.')} Set Initial Positions (e.g., AAA)`);
-    console.log(`  ${chalk.cyan('3.')} Set Plugboard Pairs (e.g., AB CD EF)`);
-    console.log(`  ${chalk.cyan('4.')} Encrypt / Decrypt a Message`);
-    console.log(`  ${chalk.cyan('5.')} Reset Positions to Initial (or set new ones)`);
-    console.log(`  ${chalk.cyan('q.')} Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '🔐 Enigma Machine Simulator',
+      `A simulated 3-rotor Enigma I/M3 encryption machine.\n\n${chalk.yellow('Current Configuration:')}\n${configText}`,
+      menuOptions
+    );
 
-    const choice = await prompt('Select an option: ');
-    const normalizedChoice = choice.trim().toLowerCase();
-
-    if (normalizedChoice === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    switch (normalizedChoice) {
-      case '1': {
+    switch (idx) {
+      case 0: {
         clearScreen();
         printHeader('🔐 Enigma - Configure Rotors', 'Choose the rotors for Left, Middle, and Right positions.');
         console.log('Available Rotors: I, II, III');
@@ -61,7 +56,7 @@ export async function run(): Promise<void> {
         break;
       }
 
-      case '2': {
+      case 1: {
         clearScreen();
         printHeader('🔐 Enigma - Set Initial Positions', 'Set the starting letter for each rotor (A-Z).');
         const posInput = await prompt('Enter 3-letter starting position (e.g., AAA): ');
@@ -76,7 +71,7 @@ export async function run(): Promise<void> {
         break;
       }
 
-      case '3': {
+      case 2: {
         clearScreen();
         printHeader('🔐 Enigma - Set Plugboard Pairs', 'Map pairs of letters to swap them. Letters cannot be reused.');
         console.log('Format: space-separated pairs of letters, e.g., "AB CD EF"');
@@ -96,7 +91,7 @@ export async function run(): Promise<void> {
         break;
       }
 
-      case '4': {
+      case 3: {
         clearScreen();
         printHeader('🔐 Enigma - Encrypt / Decrypt Message', 'Enigma is symmetric; running the ciphertext through the same setup decrypts it.');
         const plaintext = await prompt('Enter message to process: ');
@@ -126,7 +121,7 @@ export async function run(): Promise<void> {
         break;
       }
 
-      case '5': {
+      case 4: {
         clearScreen();
         printHeader('🔐 Enigma - Reset Rotor Positions', 'Reset positions back to A A A.');
         config.positions = ['A', 'A', 'A'];

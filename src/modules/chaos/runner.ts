@@ -1,37 +1,29 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { getAttractorPoints, stepChaosGame } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('📐 Chaos Game Fractal Generator', 'Emergent geometry via random navigation between attractors.');
+    const menuOptions = [
+      { name: 'Sierpinski Triangle', description: '3 Attractors, Ratio 0.5 (Classic Triangle)' },
+      { name: 'Chaos Pentagram', description: '5 Attractors, Ratio 0.618 (Golden Web)' }
+    ];
 
-    console.log(`${chalk.bold('Select Configuration:')}`);
-    console.log(`  ${chalk.cyan('1')}. Sierpinski Triangle (3 Attractors, Ratio 0.5)`);
-    console.log(`  ${chalk.cyan('2')}. Chaos Pentagram (5 Attractors, Ratio 0.6)`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '📐 Chaos Game Fractal Generator',
+      'Emergent geometry via random navigation between attractors.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    let attractorCount = 3;
-    let ratio = 0.5;
-    let label = 'Sierpinski Triangle';
-
-    if (selection === '2') {
-      attractorCount = 5;
-      ratio = 0.618; // Golden ratio! Produces a beautiful web structure
-      label = 'Chaos Pentagram';
-    } else if (selection !== '1') {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
-    }
+    const attractorCount = idx === 1 ? 5 : 3;
+    const ratio = idx === 1 ? 0.618 : 0.5;
+    const label = idx === 1 ? 'Chaos Pentagram' : 'Sierpinski Triangle';
 
     const width = 75;
     const height = 30;

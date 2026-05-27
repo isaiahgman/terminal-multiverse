@@ -1,34 +1,28 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { renderFrame } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🕶️ Text-Based 3D Ray Marcher', 'Real-time math-based 3D renderer running in your terminal.');
+    const menuOptions = [
+      { name: 'Rotating Torus (Donut)', description: 'Math-based rotating torus render' },
+      { name: 'Deforming Organic Sphere', description: 'Interactive blobby coordinate deformation' }
+    ];
 
-    console.log(`${chalk.bold('Select 3D Shape:')}`);
-    console.log(`  ${chalk.cyan('1')}. Rotating Torus (Donut)`);
-    console.log(`  ${chalk.cyan('2')}. Deforming Organic Sphere`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '🕶️ Text-Based 3D Ray Marcher',
+      'Real-time math-based 3D renderer running in your terminal.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
     }
 
-    let shape: 'torus' | 'sphere' = 'torus';
-    let label = 'Rotating Torus';
-    if (selection === '2') {
-      shape = 'sphere';
-      label = 'Deforming Sphere';
-    } else if (selection !== '1') {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
-    }
+    const shape = idx === 1 ? ('sphere' as const) : ('torus' as const);
+    const label = idx === 1 ? 'Deforming Sphere' : 'Rotating Torus';
 
     clearScreen();
     console.log(chalk.cyan('Preparing Raymarcher Engine...'));

@@ -1,27 +1,23 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { generateMaze, solveMazeBFS } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🕸️ Maze Generator & Solver', 'Procedural maze creation and visual search-algorithm solver.');
+    const menuOptions = [
+      { name: 'Animate Maze Solving (BFS Search)', description: 'Generate a maze and animate the shortest path finder' }
+    ];
 
-    console.log(`${chalk.bold('Options:')}`);
-    console.log(`  ${chalk.cyan('1')}. Animate Maze Solving (BFS Search)`);
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const idx = await selectMenuOption(
+      '🕸️ Maze Generator & Solver',
+      'Procedural maze creation and visual search-algorithm solver.',
+      menuOptions
+    );
 
-    const selection = await prompt('Select option or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    if (idx === menuOptions.length) {
       running = false;
       break;
-    }
-
-    if (selection !== '1') {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     const width = 45;

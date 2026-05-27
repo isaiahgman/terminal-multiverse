@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { generateLSystem, drawTurtlePath } from './core.js';
 
 interface LSystemPreset {
@@ -50,27 +50,21 @@ const PRESETS: Record<string, LSystemPreset> = {
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🌿 L-System Fractal Garden', 'Procedural organic structures generated via formal grammars.');
-
-    console.log(`${chalk.bold('Available Presets:')}`);
     const keys = Object.keys(PRESETS);
-    keys.forEach((key, idx) => {
-      console.log(`  ${chalk.cyan(idx + 1)}. ${PRESETS[key].name}`);
-    });
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const menuOptions = keys.map((key) => ({
+      name: PRESETS[key].name,
+      description: `Axiom: ${PRESETS[key].axiom}`,
+    }));
 
-    const selection = await prompt('Select a preset or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    const idx = await selectMenuOption(
+      '🌿 L-System Fractal Garden',
+      'Procedural organic structures generated via formal grammars.',
+      menuOptions
+    );
+
+    if (idx === keys.length) {
       running = false;
       break;
-    }
-
-    const idx = parseInt(selection) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= keys.length) {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     const presetKey = keys[idx];

@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
 import { createGrid, nextGeneration } from './core.js';
 
 interface Preset {
@@ -65,27 +65,21 @@ const PRESETS: Record<string, Preset> = {
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
-    clearScreen();
-    printHeader('🦠 Conway\'s Game of Life', 'Cellular automaton simulating cellular growth and decay.');
-
-    console.log(`${chalk.bold('Available Starting States:')}`);
     const keys = Object.keys(PRESETS);
-    keys.forEach((key, idx) => {
-      console.log(`  ${chalk.cyan(idx + 1)}. ${PRESETS[key].name}`);
-    });
-    console.log(`  ${chalk.cyan('q')}. Return to Main Menu\n`);
+    const menuOptions = keys.map((key) => ({
+      name: PRESETS[key].name,
+      description: key === 'random' ? 'Random soup simulation' : 'Preset layout simulation',
+    }));
 
-    const selection = await prompt('Select starting state or press q: ');
-    if (selection.toLowerCase() === 'q') {
+    const idx = await selectMenuOption(
+      '🦠 Conway\'s Game of Life',
+      'Cellular automaton simulating cellular growth and decay.',
+      menuOptions
+    );
+
+    if (idx === keys.length) {
       running = false;
       break;
-    }
-
-    const idx = parseInt(selection) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= keys.length) {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await pause();
-      continue;
     }
 
     const presetKey = keys[idx];
