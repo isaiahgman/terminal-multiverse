@@ -45,8 +45,9 @@ async function main(): Promise<void> {
 - **Pure Functions:** Core utilities must remain side-effect free and testable.
 - **Testing:** Comprehensive unit test coverage using modern test runners.
 
-## GitHub Pull Request Workflow
-- All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers:
+## GitHub Pull Request Workflow & Branching
+- **Branching Policy:** For every new request, feature, bug, or design thought, a new branch MUST be created from \`main\`. Address the issue on that branch and create a separate Pull Request, rather than combining unrelated changes into a single branch or PR.
+- **Pull Request Description Formatting:** All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers:
   - \`## Summary\`
   - \`## Changes\`
 - Do not use other heading hierarchies or alternative names for these sections.
