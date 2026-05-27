@@ -96,7 +96,7 @@ export function selectMenuOption(
 
     function renderMenu(isFirst: boolean = false): void {
       if (!isFirst) {
-        const linesToMove = count + 4;
+        const linesToMove = count + 2;
         process.stdout.write(`\x1B[${linesToMove}A\r\x1B[J`);
       }
 
@@ -114,9 +114,9 @@ export function selectMenuOption(
       });
 
       if (selectedIdx === count) {
-        console.log(`  ${chalk.cyan('➔')} ${chalk.bold.red('Exit Console')}\n`);
+        console.log(`  ${chalk.cyan('➔')} ${chalk.bold.red('Exit Console')}`);
       } else {
-        console.log(`    ${chalk.white('Exit Console')}\n`);
+        console.log(`    ${chalk.white('Exit Console')}`);
       }
     }
 
