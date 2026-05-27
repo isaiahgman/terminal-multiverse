@@ -53,11 +53,40 @@ export function selectMenuOption(
   subtitle: string,
   options: { name: string; description: string }[]
 ): Promise<number> {
+  const count = options.length;
+  const isTTY = typeof process.stdin.setRawMode === 'function';
+
+  if (!isTTY) {
+    // Non-TTY fallback: render as static list and prompt for number
+    clearScreen();
+    printHeader(title, subtitle);
+    console.log(chalk.bold.magenta('Available Systems:'));
+    options.forEach((opt, idx) => {
+      console.log(`  ${chalk.cyan(String(idx + 1).padStart(2, ' '))}. ${chalk.bold.white(opt.name)} - ${chalk.dim(opt.description)}`);
+    });
+    console.log(`  ${chalk.cyan(' q')}. ${chalk.bold.red('Exit Console')}\n`);
+
+    return new Promise(async (resolve) => {
+      const selection = await prompt('Enter selection: ');
+      if (selection.toLowerCase() === 'q') {
+        resolve(count);
+      } else {
+        const idx = parseInt(selection, 10) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= count) {
+          console.log(chalk.red('Invalid selection. Press Enter to retry.'));
+          await pause();
+          resolve(await selectMenuOption(title, subtitle, options)); // retry recursively
+        } else {
+          resolve(idx);
+        }
+      }
+    });
+  }
+
+  // TTY implementation: Arrow Key navigation
   return new Promise((resolve) => {
     let selectedIdx = 0;
-    const count = options.length;
 
-    // Set up keypress listener
     readline.emitKeypressEvents(process.stdin);
     const wasRaw = process.stdin.isRaw;
     process.stdin.setRawMode(true);
@@ -65,7 +94,6 @@ export function selectMenuOption(
 
     function renderMenu(isFirst: boolean = false): void {
       if (!isFirst) {
-        // Move cursor up by count + 4 lines to overwrite previous menu list
         const linesToMove = count + 4;
         process.stdout.write(`\x1B[${linesToMove}A\r\x1B[J`);
       }
@@ -83,7 +111,6 @@ export function selectMenuOption(
         }
       });
 
-      // Exit instruction
       if (selectedIdx === count) {
         console.log(`  ${chalk.cyan('➔')} ${chalk.bold.red('Exit Console')}\n`);
       } else {
@@ -91,7 +118,6 @@ export function selectMenuOption(
       }
     }
 
-    // Initial render
     clearScreen();
     printHeader(title, subtitle);
     renderMenu(true);
@@ -113,7 +139,7 @@ export function selectMenuOption(
         resolve(selectedIdx);
       } else if (key && key.name === 'q') {
         cleanup();
-        resolve(count); // returns exit option index
+        resolve(count);
       }
     };
 
