@@ -31,6 +31,7 @@
   - The `main` branch is strictly protected. Direct pushes to `main` are prohibited.
   - Pull Requests MUST NOT be merged unless all status checks (TypeScript compilation, ESLint, Prettier formatting, and Vitest runs) have passed in the CI pipeline.
   - Never use administrator bypass options (e.g. `--admin` flag) to force-merge a Pull Request while checks are failing or pending.
+  - Head branches on origin are configured to delete automatically upon merge. To keep the local repository clean, developers should prune remote references (`git remote prune origin`) and delete local branches after merge.
 - **Pull Request Description Formatting:** All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers:
   - `## Summary`
   - `## Changes`
