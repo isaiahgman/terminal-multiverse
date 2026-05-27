@@ -2,6 +2,9 @@ import chalk from 'chalk';
 import boxen from 'boxen';
 import readline from 'readline';
 
+// Initialize keypress event emission on process.stdin once at the top level
+readline.emitKeypressEvents(process.stdin);
+
 export function clearScreen(): void {
   // Clear the screen and reset cursor to home position
   process.stdout.write('\x1Bc');
@@ -87,7 +90,6 @@ export function selectMenuOption(
   return new Promise((resolve) => {
     let selectedIdx = 0;
 
-    readline.emitKeypressEvents(process.stdin);
     const wasRaw = process.stdin.isRaw;
     process.stdin.setRawMode(true);
     process.stdin.resume();
