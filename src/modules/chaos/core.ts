@@ -1,4 +1,8 @@
-export function getAttractorPoints(count: number, width: number, height: number): [number, number][] {
+export function getAttractorPoints(
+  count: number,
+  width: number,
+  height: number,
+): [number, number][] {
   const points: [number, number][] = [];
   const centerX = width / 2;
   const centerY = height / 2;
@@ -20,7 +24,7 @@ export function getAttractorPoints(count: number, width: number, height: number)
 export function stepChaosGame(
   current: [number, number],
   attractors: [number, number][],
-  ratio: number
+  ratio: number,
 ): [number, number] {
   // Pick a random attractor
   const idx = Math.floor(Math.random() * attractors.length);
@@ -37,7 +41,7 @@ export function runSimulationSteps(
   steps: number,
   start: [number, number],
   attractors: [number, number][],
-  ratio: number
+  ratio: number,
 ): [number, number][] {
   const history: [number, number][] = [];
   let curr = start;

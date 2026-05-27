@@ -81,7 +81,7 @@ describe('Enigma Encryption and Decryption', () => {
   it('should encrypt a string and decrypt it back with the same initial config', () => {
     const plaintext = 'HELLO WORLD';
     const result = encryptString(plaintext, config);
-    
+
     // Decrypting requires restarting with the exact same initial settings
     const decryptResult = encryptString(result.ciphertext, config);
     expect(decryptResult.ciphertext).toBe(plaintext);

@@ -61,7 +61,7 @@ export async function run(): Promise<void> {
       const borderLine = chalk.gray('├' + '─'.repeat(width) + '┤\n');
       const bottomBorder = chalk.gray('└' + '─'.repeat(width) + '┘\n');
 
-      statsAndPlot = 
+      statsAndPlot =
         `${chalk.yellow('Current Number:')} ${currentNum} | ${chalk.yellow('Scaling Mode:')} ${useLogScale ? 'Logarithmic' : 'Linear'}\n` +
         `${chalk.yellow('Stopping Time:')} ${chalk.greenBright(steps)} steps | ${chalk.yellow('Peak Reached:')} ${chalk.greenBright(peak)}\n\n` +
         `${chalk.bold('Sequence Pathway:')}\n  ${seqSnippet}\n\n` +
@@ -75,13 +75,13 @@ export async function run(): Promise<void> {
     const menuOptions = [
       { name: 'Input New Number', description: 'Enter a custom starting positive integer' },
       { name: 'Toggle Scale Mode', description: `Switch between Logarithmic and Linear rendering` },
-      { name: 'Try a Famous Orbit', description: 'Select a notable Collatz starting seed' }
+      { name: 'Try a Famous Orbit', description: 'Select a notable Collatz starting seed' },
     ];
 
     const idx = await selectMenuOption(
       '🔢 Collatz Conjecture Visualizer',
       statsAndPlot,
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -113,13 +113,13 @@ export async function run(): Promise<void> {
           { name: '97', description: 'Steps: 118 | Peak: 9,232' },
           { name: '871', description: 'Steps: 178 | Peak: 190,996' },
           { name: '6171', description: 'Steps: 261 | Peak: 2,634,800' },
-          { name: '1023', description: 'Steps: 311 | Peak: 104,788' }
+          { name: '1023', description: 'Steps: 311 | Peak: 104,788' },
         ];
 
         const pSel = await selectMenuOption(
           '🔢 Collatz - Famous Starting Numbers',
           'Select a notable number with interesting orbital dynamics.',
-          famousOptions
+          famousOptions,
         );
 
         if (pSel === 0) currentNum = 27;

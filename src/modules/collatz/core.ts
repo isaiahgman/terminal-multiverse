@@ -37,7 +37,7 @@ export function generateCollatzAsciiPlot(
   sequence: number[],
   width: number,
   height: number,
-  useLogScale: boolean = false
+  useLogScale: boolean = false,
 ): string[][] {
   const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(' '));
   if (sequence.length === 0) {

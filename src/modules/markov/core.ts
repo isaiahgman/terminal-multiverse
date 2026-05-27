@@ -1,7 +1,4 @@
-export function buildTransitionTable(
-  corpus: string,
-  prefixLen: number = 2
-): Map<string, string[]> {
+export function buildTransitionTable(corpus: string, prefixLen: number = 2): Map<string, string[]> {
   const table = new Map<string, string[]>();
   // Split by whitespace and filter empty words
   const words = corpus.split(/\s+/).filter((w) => w.length > 0);
@@ -26,7 +23,7 @@ export function buildTransitionTable(
 export function generateMarkovText(
   table: Map<string, string[]>,
   length: number,
-  prefixLen: number = 2
+  prefixLen: number = 2,
 ): string {
   if (table.size === 0) {
     return '';

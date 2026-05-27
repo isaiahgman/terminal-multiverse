@@ -43,7 +43,7 @@ describe('Diff Generation', () => {
 
   it('should handle empty inputs gracefully', () => {
     expect(computeDiff('', '')).toEqual([
-      { type: 'unchanged', value: '', oldLineNumber: 1, newLineNumber: 1 }
+      { type: 'unchanged', value: '', oldLineNumber: 1, newLineNumber: 1 },
     ]);
   });
 });

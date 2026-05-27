@@ -11,7 +11,9 @@ export function clearScreen(): void {
 }
 
 export function printHeader(title: string, subtitle?: string): void {
-  const content = subtitle ? `${chalk.bold.cyan(title)}\n${chalk.dim(subtitle)}` : chalk.bold.cyan(title);
+  const content = subtitle
+    ? `${chalk.bold.cyan(title)}\n${chalk.dim(subtitle)}`
+    : chalk.bold.cyan(title);
   console.log(
     boxen(content, {
       padding: 1,
@@ -19,7 +21,7 @@ export function printHeader(title: string, subtitle?: string): void {
       borderStyle: 'double',
       borderColor: 'magenta',
       float: 'left',
-    })
+    }),
   );
 }
 
@@ -74,7 +76,7 @@ export function exitAlternateBuffer(): void {
 export async function selectMenuOption(
   title: string,
   subtitle: string,
-  options: { name: string; description: string }[]
+  options: { name: string; description: string }[],
 ): Promise<number> {
   const count = options.length;
   const isTTY = typeof process.stdin.setRawMode === 'function';
@@ -85,7 +87,9 @@ export async function selectMenuOption(
     printHeader(title, subtitle);
     console.log(chalk.bold.magenta('Available Systems:'));
     options.forEach((opt, idx) => {
-      console.log(`  ${chalk.cyan(String(idx + 1).padStart(2, ' '))}. ${chalk.bold.white(opt.name)} - ${chalk.dim(opt.description)}`);
+      console.log(
+        `  ${chalk.cyan(String(idx + 1).padStart(2, ' '))}. ${chalk.bold.white(opt.name)} - ${chalk.dim(opt.description)}`,
+      );
     });
     console.log(`  ${chalk.cyan(' q')}. ${chalk.bold.red('Exit Console')}\n`);
 
@@ -122,12 +126,10 @@ export async function selectMenuOption(
       options.forEach((opt, idx) => {
         if (idx === selectedIdx) {
           console.log(
-            `  ${chalk.cyan('➔')} ${chalk.bold.green(opt.name)} - ${chalk.green(opt.description)}`
+            `  ${chalk.cyan('➔')} ${chalk.bold.green(opt.name)} - ${chalk.green(opt.description)}`,
           );
         } else {
-          console.log(
-            `    ${chalk.white(opt.name)} - ${chalk.dim(opt.description)}`
-          );
+          console.log(`    ${chalk.white(opt.name)} - ${chalk.dim(opt.description)}`);
         }
       });
 

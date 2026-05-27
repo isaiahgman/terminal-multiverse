@@ -1,8 +1,4 @@
-export function createGrid(
-  width: number,
-  height: number,
-  randomFill: boolean = false
-): number[][] {
+export function createGrid(width: number, height: number, randomFill: boolean = false): number[][] {
   const grid: number[][] = [];
   for (let y = 0; y < height; y++) {
     const row: number[] = [];

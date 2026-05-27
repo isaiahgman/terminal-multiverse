@@ -1,7 +1,7 @@
 export function generateLSystem(
   axiom: string,
   rules: Record<string, string>,
-  iterations: number
+  iterations: number,
 ): string {
   let current = axiom;
   for (let i = 0; i < iterations; i++) {
@@ -25,7 +25,7 @@ export function drawTurtlePath(
   baseAngle: number, // in degrees
   initialStep: number,
   width: number,
-  height: number
+  height: number,
 ): string[][] {
   const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(' '));
   const stack: TurtleState[] = [];
@@ -70,7 +70,7 @@ export function drawLine(
   x1: number,
   y1: number,
   grid: string[][],
-  char: string
+  char: string,
 ): void {
   const width = grid[0].length;
   const height = grid.length;

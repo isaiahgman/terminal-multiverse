@@ -22,7 +22,7 @@ const MODULES: Module[] = [
     run: runLsystem,
   },
   {
-    name: '🦠 Conway\'s Game of Life',
+    name: "🦠 Conway's Game of Life",
     description: 'Interactive cellular automata simulation loop',
     run: runLife,
   },
@@ -80,15 +80,15 @@ async function main(): Promise<void> {
     const idx = await selectMenuOption(
       '🌌 TERMINAL MULTIVERSE CONSOLE 🌌',
       'Select a workspace module to experience computational systems.',
-      MODULES.map((mod) => ({ name: mod.name, description: mod.description }))
+      MODULES.map((mod) => ({ name: mod.name, description: mod.description })),
     );
 
     if (idx === MODULES.length) {
       clearScreen();
       console.log(
         chalk.bold.yellow(
-          '\nThank you for exploring the Terminal Multiverse. Exiting console...\n'
-        )
+          '\nThank you for exploring the Terminal Multiverse. Exiting console...\n',
+        ),
       );
       running = false;
       break;
