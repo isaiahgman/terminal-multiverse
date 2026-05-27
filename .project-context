@@ -23,6 +23,7 @@
 - **Testing:** Every core file must have >90% code coverage using Vitest.
 - **Styling Guidelines:** The terminal outputs should feel premium. Use high-contrast color palettes, styled title headers using `boxen`, neat alignment, and clear instruction indicators (e.g. `[Enter] to submit`, `[q] to quit`).
 - **Git Flow:** Strict pre-commit testing and linting checks using husky and lint-staged.
+- **Local Pre-flight Checks:** Before staging, committing, or pushing code, you MUST run `npm run lint` and `npx prettier --check "src/**/*.ts"` (or `npm run format`) locally. Under no circumstances should unverified or failing code be pushed to origin, wasting CI resources.
 
 ## GitHub Pull Request Workflow & Branching
 - **Branching Policy:** For every new request, feature, bug, or design thought, a new branch MUST be created from `main`. Address the issue on that branch and create a separate Pull Request, rather than combining unrelated changes into a single branch or PR.
