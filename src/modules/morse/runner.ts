@@ -8,13 +8,16 @@ export async function run(): Promise<void> {
   let running = true;
   while (running) {
     const menuOptions = [
-      { name: 'Translate & Export Morse Audio', description: 'Enter text, translate to Morse, and output .wav file' }
+      {
+        name: 'Translate & Export Morse Audio',
+        description: 'Enter text, translate to Morse, and output .wav file',
+      },
     ];
 
     const idx = await selectMenuOption(
       '🔊 Web Audio Morse Wave Exporter',
       'Translate text to international Morse Code and export as a playable .wav audio file.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {

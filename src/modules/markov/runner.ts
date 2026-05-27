@@ -4,7 +4,7 @@ import { buildTransitionTable, generateMarkovText } from './core.js';
 
 const PRESETS: Record<string, { name: string; text: string }> = {
   shakespeare: {
-    name: 'Shakespeare\'s Hamlet Soliloquy',
+    name: "Shakespeare's Hamlet Soliloquy",
     text: `To be, or not to be, that is the question:
 Whether 'tis nobler in the mind to suffer
 The slings and arrows of outrageous fortune,
@@ -28,7 +28,7 @@ When he himself might his quietus make
 With a bare bodkin?`,
   },
   jabberwocky: {
-    name: 'Lewis Carroll\'s Jabberwocky',
+    name: "Lewis Carroll's Jabberwocky",
     text: `Twas brillig, and the slithy toves
 Did gyre and gimble in the wabe:
 All mimsy were the borogoves,
@@ -78,7 +78,7 @@ export async function run(): Promise<void> {
     const idx = await selectMenuOption(
       '✍️ Markov Chain Text Generator',
       'Generate procedural nonsense text based on word transition probabilities.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -120,7 +120,9 @@ export async function run(): Promise<void> {
     const table = buildTransitionTable(corpus, prefixLen);
 
     if (table.size === 0) {
-      console.log(chalk.red('Text corpus is too short for the chosen prefix length. Press Enter to retry.'));
+      console.log(
+        chalk.red('Text corpus is too short for the chosen prefix length. Press Enter to retry.'),
+      );
       await pause();
       continue;
     }
@@ -129,7 +131,10 @@ export async function run(): Promise<void> {
     const text = generateMarkovText(table, outputLen, prefixLen);
 
     clearScreen();
-    printHeader(`✍️ Generated Text from: ${selectedName}`, `Prefix Length: ${prefixLen} | Target Length: ${outputLen} words`);
+    printHeader(
+      `✍️ Generated Text from: ${selectedName}`,
+      `Prefix Length: ${prefixLen} | Target Length: ${outputLen} words`,
+    );
 
     console.log(chalk.bold.green('Output:'));
     console.log(chalk.italic.white(`\n"${text}"\n`));

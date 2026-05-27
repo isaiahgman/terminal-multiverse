@@ -52,7 +52,7 @@ export function textToMorse(text: string): string {
 export function generateMorseWavBuffer(
   morse: string,
   sampleRate: number = 8000,
-  frequency: number = 700
+  frequency: number = 700,
 ): Buffer {
   const dotDuration = 0.08; // 80 ms
   const samplesPerDot = Math.floor(sampleRate * dotDuration);

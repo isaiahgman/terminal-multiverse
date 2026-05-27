@@ -26,7 +26,13 @@ export function sphereSDF(x: number, y: number, z: number, r: number): number {
   return Math.sqrt(x * x + y * y + z * z) - r;
 }
 
-export function sceneSDF(x: number, y: number, z: number, time: number, shape: 'torus' | 'sphere' = 'torus'): number {
+export function sceneSDF(
+  x: number,
+  y: number,
+  z: number,
+  time: number,
+  shape: 'torus' | 'sphere' = 'torus',
+): number {
   // Rotate the coordinate space to rotate the object
   let [rx, ry, rz] = rotateY(x, y, z, time * 1.5);
   [rx, ry, rz] = rotateX(rx, ry, rz, time * 0.8);
@@ -45,7 +51,7 @@ export function getNormal(
   y: number,
   z: number,
   time: number,
-  shape: 'torus' | 'sphere' = 'torus'
+  shape: 'torus' | 'sphere' = 'torus',
 ): [number, number, number] {
   const eps = 0.001;
   const d = sceneSDF(x, y, z, time, shape);
@@ -64,7 +70,7 @@ export function renderFrame(
   width: number,
   height: number,
   time: number,
-  shape: 'torus' | 'sphere' = 'torus'
+  shape: 'torus' | 'sphere' = 'torus',
 ): string[][] {
   const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(' '));
   const lightDir: [number, number, number] = [0.577, 0.577, -0.577]; // Normalized vector pointing towards the top-right-front

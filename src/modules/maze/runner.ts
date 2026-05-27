@@ -1,18 +1,32 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
+import {
+  clearScreen,
+  printHeader,
+  prompt,
+  pause,
+  selectMenuOption,
+  hideCursor,
+  showCursor,
+  cursorToHome,
+  enterAlternateBuffer,
+  exitAlternateBuffer,
+} from '../../utils/cli.js';
 import { generateMaze, solveMazeBFS } from './core.js';
 
 export async function run(): Promise<void> {
   let running = true;
   while (running) {
     const menuOptions = [
-      { name: 'Animate Maze Solving (BFS Search)', description: 'Generate a maze and animate the shortest path finder' }
+      {
+        name: 'Animate Maze Solving (BFS Search)',
+        description: 'Generate a maze and animate the shortest path finder',
+      },
     ];
 
     const idx = await selectMenuOption(
       '🕸️ Maze Generator & Solver',
       'Procedural maze creation and visual search-algorithm solver.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -38,7 +52,11 @@ export async function run(): Promise<void> {
 
     clearScreen();
     console.log(chalk.cyan('Maze ready!'));
-    console.log(chalk.dim('We will animate the BFS expansion searching the corridors, then trace the final path.'));
+    console.log(
+      chalk.dim(
+        'We will animate the BFS expansion searching the corridors, then trace the final path.',
+      ),
+    );
     await pause('Press Enter to start solver animation...');
 
     // Animation variables
@@ -66,7 +84,9 @@ export async function run(): Promise<void> {
     while (visitedCount < visited.length && !interrupted) {
       cursorToHome();
       let frameText = chalk.bold.magenta('🕸️ BFS Solver: Exploring Corridors...\n');
-      frameText += chalk.dim('Controls: Press [q] to stop | Light blue denotes searched paths.\n\n');
+      frameText += chalk.dim(
+        'Controls: Press [q] to stop | Light blue denotes searched paths.\n\n',
+      );
 
       // Add a chunk of visited cells to show expansion
       const chunkSize = Math.max(1, Math.floor(visited.length / 40));

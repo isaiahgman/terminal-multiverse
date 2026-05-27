@@ -35,24 +35,24 @@ export async function run(): Promise<void> {
 
   while (running) {
     const diff = computeDiff(textA, textB);
-    const diffOutput = viewMode === 'unified' ? renderUnifiedDiff(diff) : renderSideBySideDiff(diff);
+    const diffOutput =
+      viewMode === 'unified' ? renderUnifiedDiff(diff) : renderSideBySideDiff(diff);
 
-    const subtitleText = 
+    const subtitleText =
       `${chalk.bold('Active Comparison Source:')} ${chalk.yellow(currentPresetName)}\n` +
       `${chalk.bold('View Mode:')}               ${chalk.magenta(viewMode === 'side-by-side' ? 'Side-by-Side' : 'Unified Line-by-Line')}\n\n` +
       diffOutput;
 
     const menuOptions = [
       { name: 'Toggle View Mode', description: 'Switch between Side-by-Side and Unified' },
-      { name: 'Load a Preset', description: 'Choose a pre-defined code, poetry, or JSON comparison' },
-      { name: 'Enter Custom Texts', description: 'Input your own text blocks A and B manually' }
+      {
+        name: 'Load a Preset',
+        description: 'Choose a pre-defined code, poetry, or JSON comparison',
+      },
+      { name: 'Enter Custom Texts', description: 'Input your own text blocks A and B manually' },
     ];
 
-    const idx = await selectMenuOption(
-      '🔍 Visual Diff Checker',
-      subtitleText,
-      menuOptions
-    );
+    const idx = await selectMenuOption('🔍 Visual Diff Checker', subtitleText, menuOptions);
 
     if (idx === menuOptions.length) {
       running = false;
@@ -68,13 +68,13 @@ export async function run(): Promise<void> {
         const keys = Object.keys(PRESETS);
         const presetOptions = keys.map((key) => ({
           name: PRESETS[key].name,
-          description: 'Compare preset text pair'
+          description: 'Compare preset text pair',
         }));
 
         const presetIdx = await selectMenuOption(
           '🔍 Visual Diff - Select Preset',
           'Choose a preset text pair to view.',
-          presetOptions
+          presetOptions,
         );
 
         if (presetIdx < keys.length) {
@@ -87,7 +87,10 @@ export async function run(): Promise<void> {
       }
       case 2: {
         clearScreen();
-        printHeader('🔍 Visual Diff - Enter Text A', 'Enter original text. Type :done on a new line when finished.');
+        printHeader(
+          '🔍 Visual Diff - Enter Text A',
+          'Enter original text. Type :done on a new line when finished.',
+        );
         const linesA: string[] = [];
         let readingA = true;
         while (readingA) {
@@ -100,7 +103,10 @@ export async function run(): Promise<void> {
         }
 
         clearScreen();
-        printHeader('🔍 Visual Diff - Enter Text B', 'Enter new modified text. Type :done on a new line when finished.');
+        printHeader(
+          '🔍 Visual Diff - Enter Text B',
+          'Enter new modified text. Type :done on a new line when finished.',
+        );
         const linesB: string[] = [];
         let readingB = true;
         while (readingB) {
@@ -160,12 +166,7 @@ function renderSideBySideDiff(diff: DiffItem[]): string {
     const leftStr = formatSideColumn(row.left, colWidth);
     const rightStr = formatSideColumn(row.right, colWidth);
 
-    output +=
-      chalk.gray('│ ') +
-      leftStr +
-      chalk.gray(' │ ') +
-      rightStr +
-      chalk.gray(' │\n');
+    output += chalk.gray('│ ') + leftStr + chalk.gray(' │ ') + rightStr + chalk.gray(' │\n');
   }
   output += chalk.gray('└' + '─'.repeat(colWidth + 2) + '┴' + '─'.repeat(colWidth + 2) + '┘');
   return output;
@@ -173,7 +174,7 @@ function renderSideBySideDiff(diff: DiffItem[]): string {
 
 function formatSideColumn(
   side: { lineNumber: number; value: string; type: 'removed' | 'added' | 'unchanged' } | undefined,
-  width: number
+  width: number,
 ): string {
   if (!side) {
     return ' '.repeat(width);
@@ -181,7 +182,7 @@ function formatSideColumn(
 
   const prefix = `[${side.lineNumber}] `.padStart(6, ' '); // Line number prefix
   const remainingWidth = width - prefix.length;
-  
+
   let val = side.value;
   if (val.length > remainingWidth) {
     val = val.substring(0, remainingWidth - 3) + '...';
