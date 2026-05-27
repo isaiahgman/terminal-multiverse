@@ -1,5 +1,16 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
+import {
+  clearScreen,
+  printHeader,
+  prompt,
+  pause,
+  selectMenuOption,
+  hideCursor,
+  showCursor,
+  cursorToHome,
+  enterAlternateBuffer,
+  exitAlternateBuffer,
+} from '../../utils/cli.js';
 import { createGrid, nextGeneration } from './core.js';
 
 interface Preset {
@@ -72,9 +83,9 @@ export async function run(): Promise<void> {
     }));
 
     const idx = await selectMenuOption(
-      '🦠 Conway\'s Game of Life',
+      "🦠 Conway's Game of Life",
       'Cellular automaton simulating cellular growth and decay.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === keys.length) {
@@ -120,7 +131,7 @@ export async function run(): Promise<void> {
 
     while (keepSimulating) {
       cursorToHome();
-      
+
       let frameText = chalk.bold.magenta(`🦠 Conway's Game of Life - ${preset.name}\n`);
       frameText += chalk.dim(`Generation: ${generation} | Press [q] to quit\n\n`);
 

@@ -14,7 +14,7 @@ export function getFourierSeriesValue(harmonics: Harmonic[], t: number): number 
 
 export function generatePresetHarmonics(
   type: 'square' | 'sawtooth' | 'triangle',
-  count: number
+  count: number,
 ): Harmonic[] {
   const harmonics: Harmonic[] = [];
 
@@ -57,7 +57,7 @@ export function plotWaveOnGrid(
   harmonics: Harmonic[],
   width: number,
   height: number,
-  timeOffset: number = 0
+  timeOffset: number = 0,
 ): string[][] {
   const grid: string[][] = Array.from({ length: height }, () => Array(width).fill(' '));
 

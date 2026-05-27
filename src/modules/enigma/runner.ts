@@ -20,14 +20,17 @@ export async function run(): Promise<void> {
       { name: 'Configure Rotors', description: 'Select I, II, III order' },
       { name: 'Set Initial Positions', description: 'Set starting letter for each rotor (A-Z)' },
       { name: 'Set Plugboard Pairs', description: 'Map letter pairs to swap (e.g., AB CD EF)' },
-      { name: 'Encrypt / Decrypt a Message', description: 'Symmetric enciphering/deciphering loop' },
-      { name: 'Reset Rotor Positions', description: 'Reset positions back to A A A' }
+      {
+        name: 'Encrypt / Decrypt a Message',
+        description: 'Symmetric enciphering/deciphering loop',
+      },
+      { name: 'Reset Rotor Positions', description: 'Reset positions back to A A A' },
     ];
 
     const idx = await selectMenuOption(
       '🔐 Enigma Machine Simulator',
       `A simulated 3-rotor Enigma I/M3 encryption machine.\n\n${chalk.yellow('Current Configuration:')}\n${configText}`,
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -38,19 +41,21 @@ export async function run(): Promise<void> {
     switch (idx) {
       case 0: {
         clearScreen();
-        printHeader('🔐 Enigma - Configure Rotors', 'Choose the rotors for Left, Middle, and Right positions.');
+        printHeader(
+          '🔐 Enigma - Configure Rotors',
+          'Choose the rotors for Left, Middle, and Right positions.',
+        );
         console.log('Available Rotors: I, II, III');
         console.log('Example input: I II III  (Left: I, Middle: II, Right: III)\n');
         const rotorInput = await prompt('Enter 3 rotor names separated by space: ');
         const rotors = rotorInput.toUpperCase().trim().split(/\s+/);
-        if (
-          rotors.length === 3 &&
-          rotors.every((r) => ['I', 'II', 'III'].includes(r))
-        ) {
+        if (rotors.length === 3 && rotors.every((r) => ['I', 'II', 'III'].includes(r))) {
           config.rotors = rotors as [string, string, string];
           console.log(chalk.green('\nRotors configured successfully!'));
         } else {
-          console.log(chalk.red('\nInvalid rotors configuration. Must be three values of I, II, or III.'));
+          console.log(
+            chalk.red('\nInvalid rotors configuration. Must be three values of I, II, or III.'),
+          );
         }
         await pause();
         break;
@@ -58,7 +63,10 @@ export async function run(): Promise<void> {
 
       case 1: {
         clearScreen();
-        printHeader('🔐 Enigma - Set Initial Positions', 'Set the starting letter for each rotor (A-Z).');
+        printHeader(
+          '🔐 Enigma - Set Initial Positions',
+          'Set the starting letter for each rotor (A-Z).',
+        );
         const posInput = await prompt('Enter 3-letter starting position (e.g., AAA): ');
         const cleanPos = posInput.toUpperCase().trim();
         if (cleanPos.length === 3 && /^[A-Z]{3}$/.test(cleanPos)) {
@@ -73,7 +81,10 @@ export async function run(): Promise<void> {
 
       case 2: {
         clearScreen();
-        printHeader('🔐 Enigma - Set Plugboard Pairs', 'Map pairs of letters to swap them. Letters cannot be reused.');
+        printHeader(
+          '🔐 Enigma - Set Plugboard Pairs',
+          'Map pairs of letters to swap them. Letters cannot be reused.',
+        );
         console.log('Format: space-separated pairs of letters, e.g., "AB CD EF"');
         console.log('Leave empty to clear all plugboard connections.\n');
         const pbInput = await prompt('Enter plugboard pairs: ');
@@ -93,7 +104,10 @@ export async function run(): Promise<void> {
 
       case 3: {
         clearScreen();
-        printHeader('🔐 Enigma - Encrypt / Decrypt Message', 'Enigma is symmetric; running the ciphertext through the same setup decrypts it.');
+        printHeader(
+          '🔐 Enigma - Encrypt / Decrypt Message',
+          'Enigma is symmetric; running the ciphertext through the same setup decrypts it.',
+        );
         const plaintext = await prompt('Enter message to process: ');
         if (!plaintext) {
           console.log(chalk.yellow('\nEmpty message. Operation cancelled.'));
@@ -103,14 +117,18 @@ export async function run(): Promise<void> {
 
         console.log(chalk.dim('\nProcessing...'));
         const result = encryptString(plaintext, config);
-        
+
         console.log('\n----------------------------------------');
         console.log(`${chalk.bold('Input Text:')}  ${plaintext}`);
         console.log(`${chalk.bold('Result:    ')}  ${chalk.greenBright(result.ciphertext)}`);
-        console.log(`\n${chalk.dim(`Final rotor positions: [ ${result.finalPositions.join(' ')} ]`)}`);
+        console.log(
+          `\n${chalk.dim(`Final rotor positions: [ ${result.finalPositions.join(' ')} ]`)}`,
+        );
         console.log('----------------------------------------');
 
-        const keepPositions = await prompt('\nApply final rotor positions for subsequent runs? (y/N): ');
+        const keepPositions = await prompt(
+          '\nApply final rotor positions for subsequent runs? (y/N): ',
+        );
         if (keepPositions.toLowerCase().startsWith('y')) {
           config.positions = result.finalPositions;
           console.log(chalk.green('Positions updated.'));

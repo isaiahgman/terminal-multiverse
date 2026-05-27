@@ -1,5 +1,16 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
+import {
+  clearScreen,
+  printHeader,
+  prompt,
+  pause,
+  selectMenuOption,
+  hideCursor,
+  showCursor,
+  cursorToHome,
+  enterAlternateBuffer,
+  exitAlternateBuffer,
+} from '../../utils/cli.js';
 import { renderFrame } from './core.js';
 
 export async function run(): Promise<void> {
@@ -7,13 +18,16 @@ export async function run(): Promise<void> {
   while (running) {
     const menuOptions = [
       { name: 'Rotating Torus (Donut)', description: 'Math-based rotating torus render' },
-      { name: 'Deforming Organic Sphere', description: 'Interactive blobby coordinate deformation' }
+      {
+        name: 'Deforming Organic Sphere',
+        description: 'Interactive blobby coordinate deformation',
+      },
     ];
 
     const idx = await selectMenuOption(
       '🕶️ Text-Based 3D Ray Marcher',
       'Real-time math-based 3D renderer running in your terminal.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -55,7 +69,7 @@ export async function run(): Promise<void> {
 
     while (keepRunning) {
       cursorToHome();
-      
+
       let frameContent = chalk.bold.magenta(`🕶️ Ray Marcher Scene: ${label}\n`);
       frameContent += chalk.dim(`Frame Angle: ${(time * 50).toFixed(0)}° | Press [q] to quit\n\n`);
 
@@ -80,7 +94,7 @@ export async function run(): Promise<void> {
         }
         frameContent += row + '\n';
       }
-      
+
       process.stdout.write(frameContent);
 
       time += 0.08;

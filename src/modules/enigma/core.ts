@@ -63,7 +63,7 @@ export function parsePlugboard(settings: string): number[] {
 // Returns the next positions as indices [L, M, R]
 export function stepRotors(
   positions: [number, number, number],
-  rotorTypes: [string, string, string]
+  rotorTypes: [string, string, string],
 ): [number, number, number] {
   const [posL, posM, posR] = positions;
   const [typeL, typeM, typeR] = rotorTypes;
@@ -94,7 +94,7 @@ export function encryptChar(
   positions: [number, number, number],
   rotorTypes: [string, string, string],
   reflectorType: string,
-  plugboardMap: number[]
+  plugboardMap: number[],
 ): string {
   const upper = char.toUpperCase();
   if (upper < 'A' || upper > 'Z') {
@@ -160,7 +160,7 @@ function rotorPassBackward(code: number, wiring: string, pos: number): number {
 // Encrypt a full string, stepping the rotors appropriately for each letter
 export function encryptString(
   input: string,
-  config: EnigmaConfig
+  config: EnigmaConfig,
 ): { ciphertext: string; finalPositions: [string, string, string] } {
   const plugboardMap = parsePlugboard(config.plugboard);
   const rotorTypes = config.rotors;

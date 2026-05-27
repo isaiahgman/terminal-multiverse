@@ -1,5 +1,16 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome, enterAlternateBuffer, exitAlternateBuffer } from '../../utils/cli.js';
+import {
+  clearScreen,
+  printHeader,
+  prompt,
+  pause,
+  selectMenuOption,
+  hideCursor,
+  showCursor,
+  cursorToHome,
+  enterAlternateBuffer,
+  exitAlternateBuffer,
+} from '../../utils/cli.js';
 import { getAttractorPoints, stepChaosGame } from './core.js';
 
 export async function run(): Promise<void> {
@@ -7,13 +18,13 @@ export async function run(): Promise<void> {
   while (running) {
     const menuOptions = [
       { name: 'Sierpinski Triangle', description: '3 Attractors, Ratio 0.5 (Classic Triangle)' },
-      { name: 'Chaos Pentagram', description: '5 Attractors, Ratio 0.618 (Golden Web)' }
+      { name: 'Chaos Pentagram', description: '5 Attractors, Ratio 0.618 (Golden Web)' },
     ];
 
     const idx = await selectMenuOption(
       '📐 Chaos Game Fractal Generator',
       'Emergent geometry via random navigation between attractors.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === menuOptions.length) {
@@ -108,7 +119,9 @@ export async function run(): Promise<void> {
       }
 
       if (totalPoints > 8000) {
-        frameText += chalk.yellow('\nMax points reached! Simulation stabilized. Press [q] to exit.\n');
+        frameText += chalk.yellow(
+          '\nMax points reached! Simulation stabilized. Press [q] to exit.\n',
+        );
       } else {
         frameText += '\n';
       }

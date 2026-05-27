@@ -59,7 +59,7 @@ export async function run(): Promise<void> {
     const idx = await selectMenuOption(
       '🌿 L-System Fractal Garden',
       'Procedural organic structures generated via formal grammars.',
-      menuOptions
+      menuOptions,
     );
 
     if (idx === keys.length) {
@@ -93,8 +93,11 @@ export async function run(): Promise<void> {
 
     // Print the grid with nice green coloring
     clearScreen();
-    printHeader(`🌿 Fractal Preview: ${preset.name}`, `Iterations: ${iterations} | Angle: ${angle}°`);
-    
+    printHeader(
+      `🌿 Fractal Preview: ${preset.name}`,
+      `Iterations: ${iterations} | Angle: ${angle}°`,
+    );
+
     let gridOutput = '';
     for (let y = 0; y < height; y++) {
       let row = '';

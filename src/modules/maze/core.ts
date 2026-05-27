@@ -20,8 +20,8 @@ export function generateMaze(width: number, height: number): number[][] {
 
     const directions = [
       [0, -2], // Up
-      [2, 0],  // Right
-      [0, 2],  // Down
+      [2, 0], // Right
+      [0, 2], // Down
       [-2, 0], // Left
     ];
 
@@ -59,14 +59,14 @@ export interface SolveResult {
 export function solveMazeBFS(
   maze: number[][],
   start: [number, number],
-  end: [number, number]
+  end: [number, number],
 ): SolveResult {
   const height = maze.length;
   const width = maze[0].length;
 
   const queue: [number, number][] = [start];
   const visitedOrder: [number, number][] = [];
-  
+
   // Track parents to reconstruct path
   const parentMap = new Map<string, string>();
   const visitedSet = new Set<string>();
