@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt } from './utils/cli.js';
+import { clearScreen, printHeader, prompt, selectMenuOption } from './utils/cli.js';
 import { Module } from './modules/types.js';
 
 // Module runners
@@ -77,24 +77,13 @@ async function main(): Promise<void> {
   let running = true;
 
   while (running) {
-    clearScreen();
-    printHeader(
+    const idx = await selectMenuOption(
       '🌌 TERMINAL MULTIVERSE CONSOLE 🌌',
-      'Select a workspace module to experience computational systems.'
+      'Select a workspace module to experience computational systems.',
+      MODULES.map((mod) => ({ name: mod.name, description: mod.description }))
     );
 
-    console.log(chalk.bold.magenta('Available Systems:'));
-    MODULES.forEach((mod, idx) => {
-      const num = String(idx + 1).padStart(2, ' ');
-      console.log(
-        `  ${chalk.cyan(num)}. ${chalk.bold.white(mod.name)} - ${chalk.dim(mod.description)}`
-      );
-    });
-    console.log(`  ${chalk.cyan(' q')}. ${chalk.bold.red('Exit Console')}\n`);
-
-    const selection = await prompt('Enter selection: ');
-
-    if (selection.toLowerCase() === 'q') {
+    if (idx === MODULES.length) {
       clearScreen();
       console.log(
         chalk.bold.yellow(
@@ -103,13 +92,6 @@ async function main(): Promise<void> {
       );
       running = false;
       break;
-    }
-
-    const idx = parseInt(selection) - 1;
-    if (isNaN(idx) || idx < 0 || idx >= MODULES.length) {
-      console.log(chalk.red('Invalid selection. Press Enter to retry.'));
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      continue;
     }
 
     try {

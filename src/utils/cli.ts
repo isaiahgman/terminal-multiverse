@@ -47,3 +47,82 @@ export function pause(message: string = 'Press Enter to continue...'): Promise<v
     });
   });
 }
+
+export function selectMenuOption(
+  title: string,
+  subtitle: string,
+  options: { name: string; description: string }[]
+): Promise<number> {
+  return new Promise((resolve) => {
+    let selectedIdx = 0;
+    const count = options.length;
+
+    // Set up keypress listener
+    readline.emitKeypressEvents(process.stdin);
+    const wasRaw = process.stdin.isRaw;
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+
+    function renderMenu(isFirst: boolean = false): void {
+      if (!isFirst) {
+        // Move cursor up by count + 4 lines to overwrite previous menu list
+        const linesToMove = count + 4;
+        process.stdout.write(`\x1B[${linesToMove}A\r\x1B[J`);
+      }
+
+      console.log(chalk.bold.magenta('Available Systems (Use ↑/↓ to navigate, Enter to run):'));
+      options.forEach((opt, idx) => {
+        if (idx === selectedIdx) {
+          console.log(
+            `  ${chalk.cyan('➔')} ${chalk.bold.green(opt.name)} - ${chalk.green(opt.description)}`
+          );
+        } else {
+          console.log(
+            `    ${chalk.white(opt.name)} - ${chalk.dim(opt.description)}`
+          );
+        }
+      });
+
+      // Exit instruction
+      if (selectedIdx === count) {
+        console.log(`  ${chalk.cyan('➔')} ${chalk.bold.red('Exit Console')}\n`);
+      } else {
+        console.log(`    ${chalk.white('Exit Console')}\n`);
+      }
+    }
+
+    // Initial render
+    clearScreen();
+    printHeader(title, subtitle);
+    renderMenu(true);
+
+    const handleKeypress = (_str: string, key: { name: string; ctrl: boolean }): void => {
+      if (key && key.ctrl && key.name === 'c') {
+        cleanup();
+        process.exit(0);
+      }
+
+      if (key && key.name === 'up') {
+        selectedIdx = (selectedIdx - 1 + (count + 1)) % (count + 1);
+        renderMenu();
+      } else if (key && key.name === 'down') {
+        selectedIdx = (selectedIdx + 1) % (count + 1);
+        renderMenu();
+      } else if (key && (key.name === 'return' || key.name === 'enter')) {
+        cleanup();
+        resolve(selectedIdx);
+      } else if (key && key.name === 'q') {
+        cleanup();
+        resolve(count); // returns exit option index
+      }
+    };
+
+    function cleanup(): void {
+      process.stdin.removeListener('keypress', handleKeypress);
+      process.stdin.setRawMode(wasRaw);
+      process.stdin.pause();
+    }
+
+    process.stdin.on('keypress', handleKeypress);
+  });
+}
