@@ -51,6 +51,18 @@ export function pause(message: string = 'Press Enter to continue...'): Promise<v
   });
 }
 
+export function hideCursor(): void {
+  process.stdout.write('\x1B[?25l');
+}
+
+export function showCursor(): void {
+  process.stdout.write('\x1B[?25h');
+}
+
+export function cursorToHome(): void {
+  process.stdout.write('\x1B[H');
+}
+
 export function selectMenuOption(
   title: string,
   subtitle: string,

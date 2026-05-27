@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome } from '../../utils/cli.js';
 import { createGrid, nextGeneration } from './core.js';
 
 interface Preset {
@@ -114,21 +114,23 @@ export async function run(): Promise<void> {
 
     process.stdin.on('data', handleKey);
 
+    hideCursor();
+    clearScreen();
+
     while (keepSimulating) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`🦠 Conway's Game of Life - ${preset.name}`));
-      console.log(chalk.dim(`Generation: ${generation} | Press [q] to quit`));
+      cursorToHome();
+      
+      let frameText = chalk.bold.magenta(`🦠 Conway's Game of Life - ${preset.name}\n`);
+      frameText += chalk.dim(`Generation: ${generation} | Press [q] to quit\n\n`);
 
       // Draw grid
-      let output = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
           row += grid[y][x] === 1 ? chalk.green('█') : chalk.dim('.');
         }
-        output += row + '\n';
+        frameText += row + '\n';
       }
-      console.log(output);
 
       // Compute next state
       const next = nextGeneration(grid);
@@ -146,8 +148,12 @@ export async function run(): Promise<void> {
       }
 
       if (isSame) {
-        console.log(chalk.yellow('\nSystem stabilized! Press [q] to exit.'));
+        frameText += chalk.yellow('\nSystem stabilized! Press [q] to exit.\n');
+      } else {
+        frameText += '\n'; // Keep spacing stable
       }
+
+      process.stdout.write(frameText);
 
       grid = next;
       generation++;
@@ -155,6 +161,8 @@ export async function run(): Promise<void> {
       // Frame wait (120ms)
       await new Promise((resolve) => setTimeout(resolve, 120));
     }
+
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);

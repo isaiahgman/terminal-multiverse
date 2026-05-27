@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { clearScreen, printHeader, prompt, pause, selectMenuOption } from '../../utils/cli.js';
+import { clearScreen, printHeader, prompt, pause, selectMenuOption, hideCursor, showCursor, cursorToHome } from '../../utils/cli.js';
 import { renderFrame } from './core.js';
 
 export async function run(): Promise<void> {
@@ -49,14 +49,17 @@ export async function run(): Promise<void> {
     const width = 60;
     const height = 25;
 
+    hideCursor();
+    clearScreen();
+
     while (keepRunning) {
-      clearScreen();
-      console.log(chalk.bold.magenta(`🕶️ Ray Marcher Scene: ${label}`));
-      console.log(chalk.dim(`Frame Angle: ${(time * 50).toFixed(0)}° | Press [q] to quit`));
+      cursorToHome();
+      
+      let frameContent = chalk.bold.magenta(`🕶️ Ray Marcher Scene: ${label}\n`);
+      frameContent += chalk.dim(`Frame Angle: ${(time * 50).toFixed(0)}° | Press [q] to quit\n\n`);
 
       const grid = renderFrame(width, height, time, shape);
 
-      let frameText = '';
       for (let y = 0; y < height; y++) {
         let row = '';
         for (let x = 0; x < width; x++) {
@@ -74,15 +77,18 @@ export async function run(): Promise<void> {
             row += ' ';
           }
         }
-        frameText += row + '\n';
+        frameContent += row + '\n';
       }
-      console.log(frameText);
+      
+      process.stdout.write(frameContent);
 
       time += 0.08;
 
       // Frame wait (~60ms, around 16 FPS)
       await new Promise((resolve) => setTimeout(resolve, 60));
     }
+
+    showCursor();
 
     // Restore stdin
     process.stdin.off('data', handleKey);
