@@ -4,6 +4,8 @@
 This file contains **global, repository-wide** rules that apply everywhere. 
 If an agent is working on a specific task, feature, or domain, it **MUST** consult the `context/rules/` directory for task-specific rules before proceeding. The combination of this global file and the modular rules forms the complete context.
 
+**Start Here:** New agents should always read [`context/rules/project_overview.md`](file:///Users/isaiahgathala/projects/terminal-multiverse/context/rules/project_overview.md) to understand the codebase architecture and tech stack before proposing changes.
+
 ## Core Architecture
 - The application is a unified interactive Node.js terminal app written in TypeScript.
 - Renders to standard output (stdout) with color utilities (`chalk`) and UI framing (`boxen`).
