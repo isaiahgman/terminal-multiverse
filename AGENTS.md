@@ -1,5 +1,9 @@
 # Project Context: Terminal Multiverse
 
+## Modular Context System
+This file contains **global, repository-wide** rules that apply everywhere. 
+If an agent is working on a specific task, feature, or domain, it **MUST** consult the `context/rules/` directory for task-specific rules before proceeding. The combination of this global file and the modular rules forms the complete context.
+
 ## Core Architecture
 - The application is a unified interactive Node.js terminal app written in TypeScript.
 - Renders to standard output (stdout) with color utilities (`chalk`) and UI framing (`boxen`).
