@@ -27,7 +27,7 @@
 
 ## GitHub Pull Request Workflow & Branching
 - **Branching Policy:** For every new request, feature, bug, or design thought, a new branch MUST be created from `main`. Address the issue on that branch and create a separate Pull Request, rather than combining unrelated changes into a single branch or PR.
-  - **Branch Naming:** Branch names should be a very short, concise phrase covering what the branch and PR is doing. All lower case, no punctuation (e.g., `migrateagentsmd`).
+  - **Branch Naming:** Branch names should be a very short, concise phrase covering what the branch and PR is doing. All lower case, separated by hyphens (e.g., `migrate-agents-context`).
   - **Commit Messages:** Commit messages should be very short, concise phrases as well. All lower case, no punctuation (e.g., `migrate agents context`).
 - **Branch Protection & Merging Rules:**
   - The `main` branch is strictly protected. Direct pushes to `main` are prohibited.
