@@ -28,7 +28,7 @@ The application operates as a unified console router. Run the startup script and
 terminal-multiverse/
 ├── .eslintrc.json           # ESLint configuration
 ├── .prettierrc              # Prettier style settings
-├── .project-context         # Persistent workspace guidelines and styles
+├── AGENTS.md                # Persistent workspace guidelines and styles for AI agents
 ├── tsconfig.json            # Strict TypeScript configuration
 ├── package.json             # NPM dependencies & test/build scripts
 ├── .github/
