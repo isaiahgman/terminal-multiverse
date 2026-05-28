@@ -33,7 +33,10 @@
   - The `main` branch is strictly protected. Direct pushes to `main` are prohibited.
   - Pull Requests MUST NOT be merged unless all status checks (TypeScript compilation, ESLint, Prettier formatting, and Vitest runs) have passed in the CI pipeline.
   - Never use administrator bypass options (e.g. `--admin` flag) to force-merge a Pull Request while checks are failing or pending.
-- **Pull Request Description Formatting:** All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers:
-  - `## Summary`
-  - `## Changes`
-- Do not use other heading hierarchies or alternative names for these sections.
+- **Pull Request Description Formatting:** All Pull Request descriptions in this repository MUST be formatted exactly with the following two main headers and structure:
+  - `## Summary`: A brief overview of what this PR accomplishes.
+  - `## Changes`: A bulleted list detailing specific modifications.
+  - Do not use other heading hierarchies or alternative names for these sections.
+- **Pull Request Sizing:**
+  - **Tiny Atomic PRs:** PRs should be as small and atomic as possible, focusing on a single issue or feature.
+  - **Stacked PRs:** If a feature or change is too large, break it down into stacked PRs to keep code reviews manageable.
