@@ -4,6 +4,8 @@
 This file contains **global, repository-wide** rules that apply everywhere. 
 If an agent is working on a specific task, feature, or domain, it **MUST** consult the `context/rules/` directory for task-specific rules before proceeding. The combination of this global file and the modular rules forms the complete context.
 
+**Start Here:** New agents should always read [`context/rules/project_overview.md`](file:///Users/isaiahgathala/projects/terminal-multiverse/context/rules/project_overview.md) to understand the codebase architecture and tech stack before proposing changes.
+
 ## Core Architecture
 - The application is a unified interactive Node.js terminal app written in TypeScript.
 - Renders to standard output (stdout) with color utilities (`chalk`) and UI framing (`boxen`).
@@ -44,3 +46,6 @@ If an agent is working on a specific task, feature, or domain, it **MUST** consu
 - **Pull Request Sizing:**
   - **Tiny Atomic PRs:** PRs should be as small and atomic as possible, focusing on a single issue or feature.
   - **Stacked PRs:** If a feature or change is too large, break it down into stacked PRs to keep code reviews manageable.
+- **Agent specific workflow:**
+  - **Always check PR status:** Agents MUST check if an existing Pull Request is already merged (e.g. using `gh pr view <number>`) before pushing new commits or updating descriptions. 
+  - If the PR is merged, the agent MUST fetch origin main, create a new branch from `main`, and open a new Pull Request. Do not push to or update dead, merged PRs.
